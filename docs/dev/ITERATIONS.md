@@ -94,7 +94,7 @@ Set up the multi-module Maven project structure, CI pipeline, and quality toolin
 
 ---
 
-## Iteration 2: Model Classes `[NOT STARTED]`
+## Iteration 2: Model Classes `[DONE]`
 
 ### Goal
 Implement all data model classes that represent the did:webvh spec's data structures. These are pure data holders with JSON serialization. No business logic yet.
@@ -180,6 +180,16 @@ Implement all data model classes that represent the did:webvh spec's data struct
 - All model tests pass
 - `./mvnw clean verify` passes
 - Checkstyle passes (Google style)
+
+### Implementation Notes
+- Added exception hierarchy (`DidWebVhException` + 4 subclasses) in `core` package.
+- Added model classes: `VersionId`, `Parameters`, `DataIntegrityProof`, `LogEntry`, `DidDocument`, `ResolutionMetadata`, `ResolveResult`, plus a shared `JsonSupport` Gson helper.
+- Added witness classes: `WitnessEntry`, `WitnessConfig`, `WitnessProofEntry`, `WitnessProofCollection`.
+- `VersionId.preliminary(scid)` covers the first-entry case where the raw string is the SCID.
+- `Parameters.merge()` copies base then overlays only non-null fields from the delta; both inputs remain unchanged.
+- `LogEntry.toJsonLine()` uses a Gson that omits nulls (compact JSONL); `fromJsonLine()` is the inverse.
+- Bumped `jacoco.version` 0.8.11 → 0.8.13 (required for the Java 25 CI matrix; 0.8.11 cannot instrument class file major 69).
+- 17 new unit tests; `./mvnw clean verify` passes on all modules.
 
 ---
 
