@@ -13,7 +13,7 @@ Your goal is to complete the next unfinished iteration safely and incrementally.
 
 Process:
 
-1. Open ITERATIONS.md and identify the first [NOT STARTED] iteration.
+1. Open docs/dev/ITERATIONS.md and identify the first [NOT STARTED] iteration.
    - If any iteration is [IN PROGRESS], stop and report it.
    - If all are [DONE], report that no work remains.
 

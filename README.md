@@ -143,4 +143,4 @@ This library implements the [did:webvh DID Method v1.0](https://identity.foundat
 
 ## Contributing
 
-See [AGENTS.md](AGENTS.md) for contributor and AI agent guidelines, and [ARCHITECTURE.md](ARCHITECTURE.md) for technical design decisions.
+See [AGENTS.md](docs/AGENTS.md) for contributor and AI agent guidelines, and [ARCHITECTURE.md](docs/ARCHITECTURE.md) for technical design decisions.

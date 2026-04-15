@@ -11,7 +11,7 @@ This is a Java 11+ library implementing the [did:webvh v1.0 specification](https
 1. **Simplicity over abstraction.** A developer should be able to read through the codebase and understand it without tracing through many layers. Use design patterns only when they earn their keep (e.g., the `Signer` adapter pattern, builders for log entry composition).
 2. **SOLID, but not academic.** Single Responsibility and Dependency Inversion are key (the `Signer` interface is a good example). Don't create interfaces for things that will only ever have one implementation.
 3. **Java 11 baseline.** No `var` in public API. No records. No sealed classes. Use standard Java 11 features. Dependencies must also support Java 11.
-4. **Spec fidelity.** The spec PDF (`Webvh v1.0.pdf`) in the repo root is the source of truth. When in doubt, follow the spec literally. Reference spec section numbers in code comments for non-obvious logic.
+4. **Spec fidelity.** The spec PDF (`docs/spec/Webvh v1.0.pdf`) is the source of truth. When in doubt, follow the spec literally. Reference spec section numbers in code comments for non-obvious logic.
 5. **Test-driven.** Every public method must have tests. Spec-related logic (SCID generation, entry hash verification, log chain validation) must have tests against known test vectors.
 
 ## Repository Structure
@@ -159,8 +159,8 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## How to Work on This Project
 
-1. Read `ARCHITECTURE.md` for the full technical design.
-2. Read `ITERATIONS.md` for the ordered list of implementation tasks with detailed prompts.
+1. Read `docs/ARCHITECTURE.md` for the full technical design.
+2. Read `docs/dev/ITERATIONS.md` for the ordered list of implementation tasks with detailed prompts.
 3. Follow the iterations in order. Each iteration has clear acceptance criteria.
 4. Run `./mvnw clean verify` after every change to ensure nothing is broken.
 5. Keep dependencies minimal. Don't add a library for something that can be done in 20 lines.

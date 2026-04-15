@@ -121,13 +121,13 @@ didwebvh-java/
   didwebvh-wizard/         # Interactive CLI
 ```
 
-For deeper technical context — package layout, design decisions, dependency rationale — see [AGENTS.md](AGENTS.md).
+For deeper technical context — package layout, design decisions, dependency rationale — see [AGENTS.md](docs/AGENTS.md).
 
-For the full architecture and algorithms — see [ARCHITECTURE.md](ARCHITECTURE.md).
+For the full architecture and algorithms — see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Implementation Roadmap
 
-The project is built incrementally across 14 iterations described in [ITERATIONS.md](ITERATIONS.md). If you want to pick up work, check which iteration is in progress and look for open issues tagged with that iteration.
+The project is built incrementally across 14 iterations described in [ITERATIONS.md](docs/dev/ITERATIONS.md). If you want to pick up work, check which iteration is in progress and look for open issues tagged with that iteration.
 
 ## Code of Conduct
 
