@@ -14,7 +14,7 @@ Read `AGENTS.md` and `ARCHITECTURE.md` before starting. The spec PDF (`Webvh v1.
 
 ---
 
-## Iteration 1: Project Scaffolding `[NOT STARTED]`
+## Iteration 1: Project Scaffolding `[DONE]`
 
 ### Goal
 Set up the multi-module Maven project structure, CI pipeline, and quality tooling. After this iteration, `./mvnw clean verify` passes with zero code (empty modules).
@@ -85,6 +85,12 @@ Set up the multi-module Maven project structure, CI pipeline, and quality toolin
 - All three modules are recognized by Maven
 - JaCoCo, Checkstyle, SpotBugs plugins are configured (they'll do nothing with no code yet)
 - `.gitignore` and `LICENSE` exist
+
+### Implementation Notes
+- Maven wrapper pre-existed (3.9.9); reused as-is
+- JitPack repository added for `com.github.multiformats:java-multihash` (not on Maven Central)
+- SpotBugs 4.9.3 used; auto-skipped on JDK >= 22 via profile (ASM doesn't support class file major version 69)
+- `./mvnw clean verify` passes on local JDK 25 (SpotBugs skipped); CI matrix targets JDK 11/17/21
 
 ---
 

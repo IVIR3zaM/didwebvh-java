@@ -1,2 +1,26 @@
+# Maven
+target/
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar.lastUpdated
+.m2/
+
+# IDE
+.idea/
+*.iml
 .vscode/
+.project
+.classpath
+.settings/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Claude
+.claude/
+
+# Logs
+*.log
