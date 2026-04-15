@@ -70,7 +70,7 @@ Set up the multi-module Maven project structure, CI pipeline, and quality toolin
 
 7. **Create GitHub Actions CI** (`.github/workflows/ci.yml`):
    - Trigger on push to `main` and all PRs
-   - Matrix: Java 11, 17, 21 on `ubuntu-latest`
+   - Matrix: Java 11, 17, 21, 25 on `ubuntu-latest`
    - Steps: checkout, setup-java (temurin), cache maven, `./mvnw clean verify -B`
    - Upload JaCoCo coverage to Codecov (using `codecov/codecov-action@v4`)
    - Run SonarCloud analysis (using `sonarsource/sonarcloud-github-action` or maven sonar plugin)
@@ -90,7 +90,7 @@ Set up the multi-module Maven project structure, CI pipeline, and quality toolin
 - Maven wrapper pre-existed (3.9.9); reused as-is
 - JitPack repository added for `com.github.multiformats:java-multihash` (not on Maven Central)
 - SpotBugs 4.9.3 used; auto-skipped on JDK >= 22 via profile (ASM doesn't support class file major version 69)
-- `./mvnw clean verify` passes on local JDK 25 (SpotBugs skipped); CI matrix targets JDK 11/17/21
+- `./mvnw clean verify` passes on local JDK 25 (SpotBugs skipped); CI matrix targets JDK 11/17/21/25
 
 ---
 
@@ -834,7 +834,7 @@ Add test vectors from the spec examples and from the Rust implementation. Ensure
 - Test vectors cover all major spec features
 - All spec MUST requirements are tested
 - Test coverage > 80% (ideally > 90% for core module)
-- All tests pass on Java 11, 17, and 21
+- All tests pass on Java 11, 17, 21, and 25
 
 ---
 
@@ -974,7 +974,7 @@ Finalize CI badges, quality gates, documentation, and prepare for first release.
 12. **Verify all badges work** (may need real CI runs first -- placeholder badge URLs are fine initially).
 
 ### Acceptance Criteria
-- CI runs green on all Java versions (11, 17, 21)
+- CI runs green on all Java versions (11, 17, 21, 25)
 - Checkstyle, SpotBugs, JaCoCo all pass
 - SonarCloud quality gate passes
 - README accurately reflects the project

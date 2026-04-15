@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ### Prerequisites
 
-- **Java 11 or later** — we recommend [Eclipse Temurin](https://adoptium.net/) (LTS versions 11, 17, or 21)
+- **Java 11 or later** — we recommend [Eclipse Temurin](https://adoptium.net/) (LTS versions 11, 17, 21, or 25)
 - **Git**
 - That's it. Maven is included in the project via the Maven Wrapper (`mvnw`).
 
@@ -77,7 +77,7 @@ Open a GitHub Issue with the `enhancement` label. Describe the use case and why 
 ### PR Review Process
 
 - PRs require at least one review before merging
-- CI must pass on all Java versions (11, 17, 21)
+- CI must pass on all Java versions (11, 17, 21, 25)
 - Coverage should not decrease
 - Keep PRs focused — one feature or fix per PR
 

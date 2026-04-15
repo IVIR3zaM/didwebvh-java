@@ -23,7 +23,7 @@ A Java 11+ library for the [did:webvh](https://didwebvh.info/) (DID Web + Verifi
 - **Parallel did:web** document publishing for backward compatibility
 - **Pluggable signing** via `Signer` interface (local Ed25519, AWS KMS, HSM, external API)
 - **Interactive wizard** CLI for guided DID management
-- **Java 11+** compatible, tested on Java 11, 17, and 21
+- **Java 11+** compatible, tested on Java 11, 17, 21, and 25
 
 ## Quick Start
 

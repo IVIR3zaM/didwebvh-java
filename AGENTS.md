@@ -141,7 +141,7 @@ CreateDidResult result = DidWebVh.create("example.com")
 
 GitHub Actions workflows:
 - **ci.yml**: Runs on every push to `main` and all PRs
-  - Matrix build: Java 11, 17, 21 on ubuntu-latest
+  - Matrix build: Java 11, 17, 21, 25 on ubuntu-latest
   - `./mvnw clean verify` (compiles, tests, checks)
   - Code coverage via JaCoCo, uploaded to Codecov
   - SonarCloud quality gate
