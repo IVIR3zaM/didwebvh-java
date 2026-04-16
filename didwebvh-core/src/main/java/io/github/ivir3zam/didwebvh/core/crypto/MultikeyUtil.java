@@ -4,7 +4,7 @@ import io.github.ivir3zam.didwebvh.core.ValidationException;
 
 public final class MultikeyUtil {
 
-    public static final byte[] ED25519_PREFIX = new byte[]{(byte) 0xed, 0x01};
+    private static final byte[] ED25519_PREFIX = new byte[]{(byte) 0xed, 0x01};
     public static final String ED25519_KEY_TYPE = "Ed25519";
 
     private MultikeyUtil() {
