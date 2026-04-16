@@ -283,7 +283,7 @@ Implement the cryptographic building blocks: JCS canonicalization, multihash, ba
 
 ---
 
-## Iteration 4: Signing Interface and Proof Generation `[NOT STARTED]`
+## Iteration 4: Signing Interface and Proof Generation `[DONE]`
 
 ### Goal
 Implement the `Signer` interface, `ProofGenerator`, `ProofVerifier`, and the `LocalKeySigner` adapter.
@@ -348,6 +348,14 @@ Implement the `Signer` interface, `ProofGenerator`, `ProofVerifier`, and the `Lo
 - `LocalKeySigner` can generate keys, sign, and verify
 - All tests pass
 - No dependency from core on `didwebvh-signing-local` (only the interface is in core)
+
+### Implementation Notes
+- `Signer` interface in `core.signing` package with `keyType()`, `verificationMethod()`, `sign()`.
+- `ProofGenerator.generate()` follows eddsa-jcs-2022: JCS-canonicalize → sign → base58btc-multibase encode → build `DataIntegrityProof` with defaults.
+- `ProofVerifier.verify()` extracts Ed25519 public key from `did:key:` verification method, JCS-canonicalizes entry, verifies Ed25519 signature via BouncyCastle.
+- `ProofVerifier.isAuthorized()` extracts multikey from verification method and checks membership in active update keys.
+- `LocalKeySigner` in `signing-local` module: generates Ed25519 keypairs, serializes to/from JWK-like JSON (`kty=OKP, crv=Ed25519`), implements `Signer`.
+- 19 new tests (11 core signing + 8 signing-local); `./mvnw clean verify` passes on all modules (70 total tests).
 
 ---
 
