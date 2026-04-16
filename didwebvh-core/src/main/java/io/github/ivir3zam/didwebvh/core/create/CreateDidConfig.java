@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import io.github.ivir3zam.didwebvh.core.signing.Signer;
 import io.github.ivir3zam.didwebvh.core.witness.WitnessConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,7 +46,8 @@ public final class CreateDidConfig {
     }
 
     public CreateDidConfig alsoKnownAs(List<String> alsoKnownAs) {
-        this.alsoKnownAs = alsoKnownAs;
+        this.alsoKnownAs = alsoKnownAs == null
+                ? null : new ArrayList<>(alsoKnownAs);
         return this;
     }
 
@@ -55,17 +57,20 @@ public final class CreateDidConfig {
     }
 
     public CreateDidConfig watchers(List<String> watchers) {
-        this.watchers = watchers;
+        this.watchers = watchers == null
+                ? null : new ArrayList<>(watchers);
         return this;
     }
 
     public CreateDidConfig nextKeyHashes(List<String> nextKeyHashes) {
-        this.nextKeyHashes = nextKeyHashes;
+        this.nextKeyHashes = nextKeyHashes == null
+                ? null : new ArrayList<>(nextKeyHashes);
         return this;
     }
 
     public CreateDidConfig additionalDocumentContent(JsonObject content) {
-        this.additionalDocumentContent = content;
+        this.additionalDocumentContent = content == null
+                ? null : content.deepCopy();
         return this;
     }
 
