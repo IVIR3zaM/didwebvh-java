@@ -193,7 +193,7 @@ Implement all data model classes that represent the did:webvh spec's data struct
 
 ---
 
-## Iteration 3: Crypto Primitives `[NOT STARTED]`
+## Iteration 3: Crypto Primitives `[DONE]`
 
 ### Goal
 Implement the cryptographic building blocks: JCS canonicalization, multihash, base58btc, SCID generation, entry hash generation, and multikey utilities.
@@ -270,6 +270,16 @@ Implement the cryptographic building blocks: JCS canonicalization, multihash, ba
 - Entry hash generation matches the spec's algorithm exactly
 - `./mvnw clean verify` passes
 - No crypto operations depend on the `Signer` interface (that's in the signing package)
+
+### Implementation Notes
+- Implemented `Jcs` using `java-json-canonicalization` (RFC 8785); wraps `JsonCanonicalizer` for both `String` and `JsonObject` inputs.
+- Implemented `MultihashUtil` with manual varint encoding (single-byte codes only, sufficient for SHA2-256 `0x12`); avoids pulling in the `java-multihash` library at runtime since only SHA-256 is needed for v1.0.
+- `Base58Btc` wraps `io.github.novacrypto:Base58`; added `encodeMultibase`/`decodeMultibase` helpers for the `z`-prefixed multibase format used throughout the spec.
+- `MultikeyUtil` handles Ed25519 multicodec prefix `0xed01`; encode/decode/keyType detection.
+- `ScidGenerator.generate()` follows spec 3.7.3: JCS → SHA-256 → multihash → base58btc-multibase. `verify()` strips proof, replaces SCID with `{SCID}`, and re-derives.
+- `EntryHashGenerator.generate()` follows spec 3.7.4: strips proof, sets versionId to predecessor, JCS → SHA-256 → multihash → base58btc-multibase.
+- `PreRotationHashGenerator` hashes the UTF-8 bytes of a multikey string per spec 3.7.7.
+- 34 new unit tests across 7 test classes; `./mvnw clean verify` passes on all modules.
 
 ---
 

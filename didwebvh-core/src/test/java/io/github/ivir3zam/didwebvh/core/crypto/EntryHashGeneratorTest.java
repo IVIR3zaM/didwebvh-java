@@ -1,0 +1,80 @@
+package io.github.ivir3zam.didwebvh.core.crypto;
+
+import com.google.gson.JsonObject;
+import io.github.ivir3zam.didwebvh.core.model.LogEntry;
+import io.github.ivir3zam.didwebvh.core.model.Parameters;
+import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class EntryHashGeneratorTest {
+
+    @Test
+    void generateProducesMultibaseResult() {
+        String json = "{\"versionId\":\"placeholder\",\"versionTime\":\"2024-01-01T00:00:00Z\","
+                + "\"parameters\":{},\"state\":{\"id\":\"did:example:123\"}}";
+        String hash = EntryHashGenerator.generate(json, "predecessor-id");
+        assertThat(hash).startsWith("z");
+    }
+
+    @Test
+    void generateIsDeterministic() {
+        String json = "{\"versionId\":\"v\",\"versionTime\":\"2024-01-01T00:00:00Z\","
+                + "\"parameters\":{},\"state\":{}}";
+        String hash1 = EntryHashGenerator.generate(json, "pred");
+        String hash2 = EntryHashGenerator.generate(json, "pred");
+        assertThat(hash1).isEqualTo(hash2);
+    }
+
+    @Test
+    void differentPredecessorProducesDifferentHash() {
+        String json = "{\"versionId\":\"v\",\"versionTime\":\"2024-01-01T00:00:00Z\","
+                + "\"parameters\":{},\"state\":{}}";
+        String hash1 = EntryHashGenerator.generate(json, "pred1");
+        String hash2 = EntryHashGenerator.generate(json, "pred2");
+        assertThat(hash1).isNotEqualTo(hash2);
+    }
+
+    @Test
+    void verifyMatchingEntry() {
+        JsonObject state = new JsonObject();
+        state.addProperty("id", "did:example:123");
+        Parameters params = new Parameters().setMethod("did:webvh:1.0");
+
+        LogEntry entry = new LogEntry()
+                .setVersionId("placeholder")
+                .setVersionTime("2024-01-01T00:00:00Z")
+                .setParameters(params)
+                .setState(state);
+
+        String predecessorId = "some-scid";
+        String entryJson = entry.toJsonLine();
+        String hash = EntryHashGenerator.generate(entryJson, predecessorId);
+
+        entry.setVersionId("1-" + hash);
+        assertThat(EntryHashGenerator.verify(entry, predecessorId)).isTrue();
+    }
+
+    @Test
+    void verifyRejectsTamperedState() {
+        JsonObject state = new JsonObject();
+        state.addProperty("id", "did:example:123");
+
+        LogEntry entry = new LogEntry()
+                .setVersionId("placeholder")
+                .setVersionTime("2024-01-01T00:00:00Z")
+                .setParameters(new Parameters())
+                .setState(state);
+
+        String predecessorId = "some-scid";
+        String entryJson = entry.toJsonLine();
+        String hash = EntryHashGenerator.generate(entryJson, predecessorId);
+
+        state.addProperty("id", "did:example:TAMPERED");
+        entry.setVersionId("1-" + hash).setState(state);
+
+        assertThat(EntryHashGenerator.verify(entry, predecessorId)).isFalse();
+    }
+}

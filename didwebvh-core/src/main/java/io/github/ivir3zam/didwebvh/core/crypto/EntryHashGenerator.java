@@ -1,0 +1,26 @@
+package io.github.ivir3zam.didwebvh.core.crypto;
+
+import com.google.gson.JsonObject;
+import io.github.ivir3zam.didwebvh.core.model.JsonSupport;
+import io.github.ivir3zam.didwebvh.core.model.LogEntry;
+
+public final class EntryHashGenerator {
+
+    private EntryHashGenerator() {
+    }
+
+    public static String generate(String entryJson, String predecessorVersionId) {
+        JsonObject entry = JsonSupport.compact().fromJson(entryJson, JsonObject.class);
+        entry.remove("proof");
+        entry.addProperty("versionId", predecessorVersionId);
+        byte[] canonical = Jcs.canonicalize(entry);
+        byte[] multihash = MultihashUtil.hashAndEncode(canonical);
+        return Base58Btc.encodeMultibase(multihash);
+    }
+
+    public static boolean verify(LogEntry entry, String predecessorVersionId) {
+        String entryJson = entry.toJsonLine();
+        String expectedHash = generate(entryJson, predecessorVersionId);
+        return expectedHash.equals(entry.getEntryHash());
+    }
+}
