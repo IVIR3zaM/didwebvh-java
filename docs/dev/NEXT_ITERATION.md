@@ -18,7 +18,7 @@ Process:
    - If all are [DONE], report that no work remains.
 
 2. Read only the files strictly needed for this iteration.
-   - Do not read or summarize entire repository documents unless required.
+   - Do not read or summarize entire repository documents unless required, but be aware of the fact that docs/AGNETS.md and docs/ARCHITECTURE.md files is important and read them if necessary.
    - If the spec PDF is needed, extract only the exact requirement needed and summarize it briefly in your own words.
 
 3. Before code changes, update only the single status line for the target iteration:
