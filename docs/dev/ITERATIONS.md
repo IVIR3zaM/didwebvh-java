@@ -359,7 +359,7 @@ Implement the `Signer` interface, `ProofGenerator`, `ProofVerifier`, and the `Lo
 
 ---
 
-## Iteration 5: DID Creation `[NOT STARTED]`
+## Iteration 5: DID Creation `[DONE]`
 
 ### Goal
 Implement the full DID creation flow as specified in spec section 3.6.1. After this iteration, a user can create a new did:webvh DID with a valid first log entry.
@@ -431,6 +431,16 @@ Implement the full DID creation flow as specified in spec section 3.6.1. After t
 - All JSONL output is compact single-line JSON
 - Tests cover normal and edge cases
 
+### Implementation Notes
+- Added `CreateDidConfig` builder, `CreateDidResult` data class, and `CreateDidOperation` in `core.create` package.
+- `CreateDidOperation.execute()` follows spec section 3.6.1: builds preliminary entry with `{SCID}` placeholders, generates SCID, replaces placeholders, generates entry hash, sets `versionId` to `1-<hash>`, signs with `ProofGenerator`.
+- `DidWebVh.create(domain, signer)` facade returns `CreateDidConfig` for fluent builder usage.
+- Fixed `ScidGenerator.verify()` to explicitly reset `versionId` and `parameters.scid` to `{SCID}` before string replacement (spec steps 2-3); previously only did blanket string replacement which failed because `versionId` (`1-<hash>`) doesn't contain the SCID.
+- DID Document includes `@context`, `id`, `controller`, `verificationMethod` (Multikey type), `authentication`, and `assertionMethod` by default.
+- Signer's public multikey is extracted from `verificationMethod()` URI (no dependency on `LocalKeySigner`).
+- Creation-time validation: `ttl` must be positive, `nextKeyHashes` entries must be non-empty multibase strings. Witness config validation deferred to Iteration 7 (log chain validation). Domain/path validation deferred to Iteration 6 (`DidWebVhUrl`).
+- 27 new unit tests covering minimal creation, all options, SCID/hash/proof verification, JSONL round-trip, path/port handling, and validation errors; `./mvnw clean verify` passes on all modules (97 total tests).
+
 ---
 
 ## Iteration 6: DID URL Parsing and DID-to-HTTPS Transformation `[NOT STARTED]`
@@ -450,9 +460,11 @@ Implement DID URL parsing and the DID-to-HTTPS transformation algorithm from spe
    - Validate against spec ABNF:
      - Must start with `did:webvh:`
      - SCID must be 46 characters base58btc
-     - Domain must be valid
-     - Port must be percent-encoded (`%3A`)
+     - Domain must be a valid DNS name (no IP addresses per spec section 3.3)
+     - Port must be percent-encoded (`%3A`), reject raw colon in domain
+     - Path segments must be non-empty (no `::` producing empty segments)
    - `toString()` reconstructs the DID string
+   - This class becomes the single source of truth for domain/path validation; `CreateDidOperation` delegates domain/path validation to `DidWebVhUrl.validate()` or equivalent
 
 2. **`DidToHttpsTransformer`** in `url` package:
    - `static String toHttpsUrl(String did)` - full implementation of spec section 3.4:
@@ -479,7 +491,11 @@ Implement DID URL parsing and the DID-to-HTTPS transformation algorithm from spe
   - `did:webvh:{SCID}:issuer.example.com` -> `https://issuer.example.com/.well-known/did.jsonl`
   - `did:webvh:{SCID}:example.com:dids:issuer` -> `https://example.com/dids/issuer/did.jsonl`
   - `did:webvh:{SCID}:example.com%3A3000:dids:issuer` -> `https://example.com:3000/dids/issuer/did.jsonl`
-- Parse invalid DIDs and verify `UrlParseException` is thrown
+- Parse invalid DIDs and verify `UrlParseException` is thrown:
+  - IP address as domain (e.g., `did:webvh:{SCID}:192.168.1.1`) -> rejected
+  - Raw colon port (e.g., `did:webvh:{SCID}:example.com:3000`) -> rejected (must be `%3A`)
+  - Empty path segment (e.g., `did:webvh:{SCID}:example.com::issuer`) -> rejected
+  - Missing SCID or wrong length -> rejected
 - Round-trip: construct DidWebVhUrl, toString(), parse again, verify equality
 - Test witness URL generation
 - Test did:web conversion
@@ -511,6 +527,8 @@ Implement the full log chain validation logic from spec section 3.6.2. This is t
         - `scid` MUST NOT appear in later entries
         - `portable` can ONLY be set to `true` in first entry, cannot change from `false` to `true`
         - `method` must be valid semver, >= previous
+        - If `witness` is set: `threshold` must be >= 1 and <= witness count
+        - If `witness` is active (set in current or previous entry): witness proofs are required for subsequent entries (delegated to `WitnessValidator`)
      5. For first entry: verify SCID using `ScidGenerator.verify()`
      6. Verify entry hash using `EntryHashGenerator.verify()`
      7. Verify Data Integrity proof:
@@ -559,7 +577,8 @@ Implement the full log chain validation logic from spec section 3.6.2. This is t
 - **Pre-rotation**: create with nextKeyHashes, update with matching keys -> valid; update with non-matching -> fails
 - **Deactivation**: deactivate, then try to add entry -> fails
 - **Parameter validation**: missing method in first entry -> fails, scid in second entry -> fails
-- **Witness validation**: threshold met -> valid, threshold not met -> fails, invalid witness signature -> fails
+- **Witness config validation**: threshold < 1 -> fails, threshold > witness count -> fails
+- **Witness proof validation**: threshold met -> valid, threshold not met -> fails, invalid witness signature -> fails
 - **Graceful degradation**: valid entries followed by invalid -> returns last valid index
 
 ### Acceptance Criteria
