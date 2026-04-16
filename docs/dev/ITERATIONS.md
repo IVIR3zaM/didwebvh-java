@@ -443,7 +443,7 @@ Implement the full DID creation flow as specified in spec section 3.6.1. After t
 
 ---
 
-## Iteration 6: DID URL Parsing and DID-to-HTTPS Transformation `[NOT STARTED]`
+## Iteration 6: DID URL Parsing and DID-to-HTTPS Transformation `[DONE]`
 
 ### Goal
 Implement DID URL parsing and the DID-to-HTTPS transformation algorithm from spec section 3.4.
@@ -506,6 +506,14 @@ Implement DID URL parsing and the DID-to-HTTPS transformation algorithm from spe
 - Port percent-encoding is handled correctly
 - Path segments are handled correctly
 - `.well-known` is used when there's no path
+
+### Implementation Notes
+- Added `DidWebVhUrl` in `core.url` package: parses `did:webvh:<SCID>:<domain>[:<path>...][?query][#fragment]` with full ABNF validation.
+- SCID validated as exactly 46 base58btc characters per spec ABNF. Domain validated against IP addresses (IPv4/IPv6 rejected). Port must be percent-encoded (`%3A`); raw colons are path separators.
+- Added `DidToHttpsTransformer` in `core.url` package: implements spec section 3.4 transformation with Unicode normalization (NFC) and IDNA/Punycode via `java.net.IDN`. Path segments percent-encoded per RFC 3986.
+- `toHttpsUrl()`, `toWitnessUrl()`, and `toDidWebUrl()` all delegate to `DidWebVhUrl.parse()` for validation.
+- `.well-known` prefix used when no path segments; `did-witness.json` replaces `did.jsonl` for witness URLs.
+- 36 new unit tests (21 DidWebVhUrlTest + 15 DidToHttpsTransformerTest); `./mvnw clean verify` passes on all modules (133 total tests).
 
 ---
 
