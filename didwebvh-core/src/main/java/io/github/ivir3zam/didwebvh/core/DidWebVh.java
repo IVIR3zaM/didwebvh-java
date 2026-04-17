@@ -5,6 +5,9 @@ import io.github.ivir3zam.didwebvh.core.model.LogEntry;
 import io.github.ivir3zam.didwebvh.core.model.ResolveResult;
 import io.github.ivir3zam.didwebvh.core.resolve.DidResolver;
 import io.github.ivir3zam.didwebvh.core.signing.Signer;
+import io.github.ivir3zam.didwebvh.core.update.DeactivateDidConfig;
+import io.github.ivir3zam.didwebvh.core.update.MigrateDidConfig;
+import io.github.ivir3zam.didwebvh.core.update.UpdateDidConfig;
 import io.github.ivir3zam.didwebvh.core.validate.LogChainValidator;
 import io.github.ivir3zam.didwebvh.core.validate.ValidationResult;
 
@@ -18,6 +21,11 @@ import java.util.List;
  * CreateDidResult result = DidWebVh.create("example.com", signer)
  *         .portable(true)
  *         .ttl(3600)
+ *         .execute();
+ *
+ * DidWebVhState state = DidWebVhState.from(result.getDid(), result.getLogEntry());
+ * UpdateDidResult updated = DidWebVh.update(state, signer)
+ *         .newDocument(newDoc)
  *         .execute();
  * }</pre>
  */
@@ -35,6 +43,42 @@ public final class DidWebVh {
      */
     public static CreateDidConfig create(String domain, Signer signer) {
         return new CreateDidConfig(domain, signer);
+    }
+
+    /**
+     * Begin configuring a standard DID update (spec section 3.6.3).
+     *
+     * @param state  the current DID state (all existing log entries)
+     * @param signer the authorised signing key
+     * @return a builder for further configuration
+     */
+    public static UpdateDidConfig update(DidWebVhState state, Signer signer) {
+        return new UpdateDidConfig(state, signer);
+    }
+
+    /**
+     * Begin configuring a DID migration to a new domain (spec section 3.7.6).
+     * The DID must have been created with {@code portable: true}.
+     *
+     * @param state     the current DID state
+     * @param signer    the authorised signing key
+     * @param newDomain the target domain (e.g. {@code "new.example.com"})
+     * @return a builder for further configuration
+     */
+    public static MigrateDidConfig migrate(DidWebVhState state, Signer signer,
+                                           String newDomain) {
+        return new MigrateDidConfig(state, signer, newDomain);
+    }
+
+    /**
+     * Begin configuring DID deactivation (spec section 3.6.4).
+     *
+     * @param state  the current DID state
+     * @param signer the authorised signing key
+     * @return a builder for further configuration
+     */
+    public static DeactivateDidConfig deactivate(DidWebVhState state, Signer signer) {
+        return new DeactivateDidConfig(state, signer);
     }
 
     /**

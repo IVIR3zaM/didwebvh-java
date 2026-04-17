@@ -696,7 +696,7 @@ Implement DID resolution: fetch `did.jsonl` (and `did-witness.json`) from HTTPS,
 
 ---
 
-## Iteration 9: DID Update, Migration, and Deactivation `[NOT STARTED]`
+## Iteration 9: DID Update, Migration, and Deactivation `[DONE]`
 
 ### Goal
 Implement all update operations from spec section 3.6.3 and deactivation from section 3.6.4.
@@ -764,6 +764,17 @@ Implement all update operations from spec section 3.6.3 and deactivation from se
 - Migration preserves SCID and history
 - Deactivation correctly handles pre-rotation edge case
 - `DidWebVhState` tracks full state correctly
+
+### Implementation Notes
+- Added `DidWebVhState` in `core` package (not a sub-package, per ARCHITECTURE.md). Holds the log entries, optional witness proofs, and active parameters from the last `validate()` call. `accumulateParameters()` is `public` so operations in the `update` sub-package can read effective state without a full crypto-validated run.
+- `DidWebVhState.did` is mutable: `appendEntry()` re-reads the appended entry's `state.id` and updates the canonical DID if it changed. This keeps migration-aware — after a successful migration, `state.getDid()` returns the new DID and validator calls pick up the new domain. First entry's DID still comes from `DidWebVhState.from(did, entry)`.
+- `UpdateDidOperation.buildEntry()` is `static` package-accessible and shared by `MigrateDidOperation` and `DeactivateDidOperation` to avoid code duplication — the entry-construction logic is identical, only the state/params inputs differ.
+- Both `CreateDidOperation` and `UpdateDidOperation` use `Instant.now().toString()` for `versionTime`. This emits ISO-8601 with whatever sub-second precision the clock reports (0–9 fractional digits — NOT the canonical `yyyy-MM-ddTHH:mm:ssZ` form), and is always parseable by `Instant.parse()`. The validator requires strict `isAfter()` ordering; a second-precision formatter causes spurious failures when create/update happen in the same second, and a fixed-milli formatter collides on fast successive writes. Sub-second resolution is the pragmatic choice.
+- `MigrateDidOperation` uses string replacement (`oldDid → newDid`) on the serialised JSON to rewrite all references in one pass, then adds the old DID to `alsoKnownAs` (deduplication guard included). `DidWebVhUrl.parse()` is called to extract the SCID before building the new DID, ensuring domain/path validation is delegated to the URL layer.
+- Pre-rotation deactivation requires two signers: `signer` (current authorised key, signs the intermediate entry that reveals the next key and clears `nextKeyHashes`) and `nextRotationSigner` (the key committed in `nextKeyHashes`, signs the final `deactivated=true` entry). A clear `ValidationException` is thrown at config time if pre-rotation is active but `nextRotationSigner` is missing.
+- `ProofVerifier.extractMultikey(String)` (public from Iteration 7) is reused in `DeactivateDidOperation` to get the next key's multikey from the `nextRotationSigner` verification method URI, avoiding any coupling to `CreateDidOperation`.
+- `DeactivateDidConfig` / `MigrateDidConfig` follow the same builder-pattern convention as `CreateDidConfig` and `UpdateDidConfig`; all have package-private accessors and a public `execute()` method.
+- Three new facade methods added to `DidWebVh`: `update()`, `migrate()`, `deactivate()` (all returning their respective config/builder). A dedicated `DidWebVhStateTest` (11 cases) covers the public `DidWebVhState` surface — factory methods, JSONL/JSON round-trips, validate/append lifecycle, migration DID-sync, deactivation flag, parameter accumulation. Total tests: 218 (210 core + 8 signing-local); `./mvnw clean verify` passes.
 
 ---
 

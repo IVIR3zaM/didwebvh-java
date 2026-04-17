@@ -12,10 +12,7 @@ import io.github.ivir3zam.didwebvh.core.signing.ProofGenerator;
 import io.github.ivir3zam.didwebvh.core.signing.Signer;
 
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,10 +22,6 @@ final class CreateDidOperation {
 
     private static final String METHOD_VERSION = "did:webvh:1.0";
     private static final String SCID_PLACEHOLDER = ScidGenerator.placeholder();
-
-    private static final DateTimeFormatter ISO_UTC =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
-                    .withZone(ZoneOffset.UTC);
 
     private CreateDidOperation() {
     }
@@ -48,7 +41,7 @@ final class CreateDidOperation {
         Parameters params = buildParameters(signerMultikey, config);
 
         // Step 4: Build preliminary log entry (no proof)
-        String versionTime = ISO_UTC.format(Instant.now());
+        String versionTime = Instant.now().toString();
         LogEntry preliminary = new LogEntry()
                 .setVersionId(SCID_PLACEHOLDER)
                 .setVersionTime(versionTime)
