@@ -30,10 +30,9 @@ class ScidGeneratorTest {
     }
 
     @Test
-    void generateProducesMultibaseResult() {
+    void generateProducesSpecScidLength() {
         String scid = ScidGenerator.generate(buildPreliminaryEntry());
-        assertThat(scid).startsWith("z");
-        assertThat(scid).hasSizeGreaterThan(20);
+        assertThat(scid).hasSize(46);
     }
 
     @Test

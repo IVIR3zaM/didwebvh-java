@@ -614,7 +614,7 @@ Implement the full log chain validation logic from spec section 3.6.2. This is t
 
 ---
 
-## Iteration 8: DID Resolution `[NOT STARTED]`
+## Iteration 8: DID Resolution `[DONE]`
 
 ### Goal
 Implement DID resolution: fetch `did.jsonl` (and `did-witness.json`) from HTTPS, parse, validate, and return the resolved DID Document with metadata.
@@ -682,6 +682,17 @@ Implement DID resolution: fetch `did.jsonl` (and `did-witness.json`) from HTTPS,
 - Query parameter filtering (versionId, versionTime, versionNumber)
 - Resolution metadata matches spec section 3.6.2
 - Error responses follow spec (notFound, invalidDid with problemDetails)
+
+### Implementation Notes
+- Added `ResolveOptions` in `core.resolve` with `versionId`, `versionTime`, `versionNumber`, and `WitnessFetchMode`. Only one version selector is accepted at a time; the spec describes each selector but does not explicitly define combined-selector semantics, so ambiguous combinations fail with `invalidDid`.
+- Added `HttpDidFetcher` and `FileDidFetcher` in `core.resolve`. `HttpDidFetcher` uses OkHttp, default 10s timeout, configurable timeout via `HttpDidFetcher(Duration, int)` or `DidResolver(Duration, int)`, and a 200KB streaming response-size guard. The size guard is an implementation safety limit, not a did:webvh spec rule.
+- Added `LogProcessor.process()` in `core.resolve`: parses JSONL into `LogEntry`, validates with `LogChainValidator`, fetches/parses witness proofs only when required by active log parameters (or accepts proactively fetched content), applies version selection, and builds `ResolveResult` / `ResolutionMetadata`.
+- Added `DidResolver` in `core.resolve`: parses `DidWebVhUrl`, transforms to `did.jsonl` / `did-witness.json` URLs, fetches over HTTP, supports file and in-memory resolution, and supports proactive or when-required witness retrieval.
+- `versionTime` selection returns the last log entry whose `versionTime` is less than or equal to the requested time, matching the version active at that time.
+- `ResolutionException` now carries resolver error codes plus Problem Details with `urn:didwebvh:error:<code>` problem types instead of `about:blank`.
+- Corrected SCID generation/parsing to the spec ABNF: 46 base58btc characters without a multibase `z` prefix. This replaced the earlier generated 47-character multibase SCID behavior.
+- Added `DidWebVh.resolve(String)` facade method.
+- Added focused tests for file resolution, query selection, witness validation and fetch modes, HTTP errors, size limits, timeouts, Problem Details, SCID length, and active-at-time selection.
 
 ---
 

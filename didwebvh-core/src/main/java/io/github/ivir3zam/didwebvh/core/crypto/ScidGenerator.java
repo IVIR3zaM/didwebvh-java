@@ -40,6 +40,6 @@ public final class ScidGenerator {
     private static String deriveScid(String json) {
         byte[] canonical = Jcs.canonicalize(json);
         byte[] multihash = MultihashUtil.hashAndEncode(canonical);
-        return Base58Btc.encodeMultibase(multihash);
+        return Base58Btc.encode(multihash);
     }
 }

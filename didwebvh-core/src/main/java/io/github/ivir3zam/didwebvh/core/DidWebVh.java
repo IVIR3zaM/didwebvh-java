@@ -2,6 +2,8 @@ package io.github.ivir3zam.didwebvh.core;
 
 import io.github.ivir3zam.didwebvh.core.create.CreateDidConfig;
 import io.github.ivir3zam.didwebvh.core.model.LogEntry;
+import io.github.ivir3zam.didwebvh.core.model.ResolveResult;
+import io.github.ivir3zam.didwebvh.core.resolve.DidResolver;
 import io.github.ivir3zam.didwebvh.core.signing.Signer;
 import io.github.ivir3zam.didwebvh.core.validate.LogChainValidator;
 import io.github.ivir3zam.didwebvh.core.validate.ValidationResult;
@@ -44,5 +46,15 @@ public final class DidWebVh {
      */
     public static ValidationResult validate(List<LogEntry> entries, String expectedDid) {
         return new LogChainValidator().validate(entries, expectedDid);
+    }
+
+    /**
+     * Resolve a did:webvh DID over HTTPS.
+     *
+     * @param did the DID to resolve
+     * @return the resolution result
+     */
+    public static ResolveResult resolve(String did) {
+        return new DidResolver().resolve(did);
     }
 }
