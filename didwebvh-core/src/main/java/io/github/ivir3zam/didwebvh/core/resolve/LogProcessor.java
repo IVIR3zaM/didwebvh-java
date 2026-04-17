@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /** Parses, validates, and selects entries from a did:webvh log. */
-public class LogProcessor {
+class LogProcessor {
 
     private final LogChainValidator logChainValidator;
     private final WitnessValidator witnessValidator;
 
-    public LogProcessor() {
+    LogProcessor() {
         this(new LogChainValidator(), new WitnessValidator());
     }
 
@@ -37,8 +37,8 @@ public class LogProcessor {
         this.witnessValidator = witnessValidator;
     }
 
-    public ResolveResult process(String didLogContent, String witnessContent,
-                                 String did, ResolveOptions options) {
+    ResolveResult process(String didLogContent, String witnessContent,
+                          String did, ResolveOptions options) {
         return process(didLogContent, witnessContent, did, options, null);
     }
 

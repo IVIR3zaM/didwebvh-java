@@ -25,10 +25,17 @@ public final class HttpDidFetcher implements RemoteDidFetcher {
     private final Duration timeout;
     private final int maxResponseSize;
 
+    /** Creates a fetcher with the default 10 s timeout and 200 KB response size limit. */
     public HttpDidFetcher() {
         this(DEFAULT_TIMEOUT, DEFAULT_MAX_RESPONSE_SIZE);
     }
 
+    /**
+     * Creates a fetcher with the given timeout and maximum response size.
+     *
+     * @param timeout         read/connect/call timeout; must be positive
+     * @param maxResponseSize upper bound on response body size in bytes; must be positive
+     */
     public HttpDidFetcher(Duration timeout, int maxResponseSize) {
         if (timeout == null || timeout.isNegative() || timeout.isZero()) {
             throw new IllegalArgumentException("timeout must be positive");
@@ -45,19 +52,23 @@ public final class HttpDidFetcher implements RemoteDidFetcher {
         this.maxResponseSize = maxResponseSize;
     }
 
+    /** Returns the configured read/connect/call timeout. */
     public Duration getTimeout() {
         return timeout;
     }
 
+    /** Returns the maximum allowed response body size in bytes. */
     public int getMaxResponseSize() {
         return maxResponseSize;
     }
 
+    /** Fetches the {@code did.jsonl} log from the given HTTPS URL. */
     @Override
     public String fetchDidLog(String httpsUrl) {
         return fetch(httpsUrl, "did log");
     }
 
+    /** Fetches the {@code did-witness.json} proof file from the given HTTPS URL. */
     @Override
     public String fetchWitnessProofs(String witnessUrl) {
         return fetch(witnessUrl, "witness proofs");

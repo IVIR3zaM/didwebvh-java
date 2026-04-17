@@ -8,13 +8,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /** Reads did:webvh resolution artifacts from the local filesystem. */
-public class FileDidFetcher {
+class FileDidFetcher {
 
-    public String fetchDidLog(Path filePath) {
+    String fetchDidLog(Path filePath) {
         return read(filePath, "did log");
     }
 
-    public String fetchWitnessProofs(Path witnessPath) {
+    String fetchWitnessProofs(Path witnessPath) {
         return read(witnessPath, "witness proofs");
     }
 

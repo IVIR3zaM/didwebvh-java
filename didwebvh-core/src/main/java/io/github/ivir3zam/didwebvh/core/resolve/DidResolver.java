@@ -16,22 +16,34 @@ public class DidResolver {
     private final FileDidFetcher fileFetcher;
     private final LogProcessor logProcessor;
 
+    /** Creates a resolver with default HTTP settings (10 s timeout, 200 KB response limit). */
     public DidResolver() {
         this(new HttpDidFetcher(), new FileDidFetcher(), new LogProcessor());
     }
 
+    /**
+     * Creates a resolver with a custom HTTP timeout and the default 200 KB response size limit.
+     *
+     * @param timeout read/connect/call timeout; must be positive
+     */
     public DidResolver(Duration timeout) {
         this(new HttpDidFetcher(timeout, HttpDidFetcher.DEFAULT_MAX_RESPONSE_SIZE),
                 new FileDidFetcher(), new LogProcessor());
     }
 
+    /**
+     * Creates a resolver with a custom HTTP timeout and maximum response size.
+     *
+     * @param timeout         read/connect/call timeout; must be positive
+     * @param maxResponseSize upper bound on response body size in bytes; must be positive
+     */
     public DidResolver(Duration timeout, int maxResponseSize) {
         this(new HttpDidFetcher(timeout, maxResponseSize),
                 new FileDidFetcher(), new LogProcessor());
     }
 
-    public DidResolver(HttpDidFetcher httpFetcher, FileDidFetcher fileFetcher,
-                       LogProcessor logProcessor) {
+    DidResolver(HttpDidFetcher httpFetcher, FileDidFetcher fileFetcher,
+                LogProcessor logProcessor) {
         this((RemoteDidFetcher) httpFetcher, fileFetcher, logProcessor);
     }
 
@@ -42,10 +54,23 @@ public class DidResolver {
         this.logProcessor = logProcessor;
     }
 
+    /**
+     * Resolves a did:webvh DID over HTTPS using default options.
+     *
+     * @param did the DID to resolve
+     * @return the resolved document and metadata
+     */
     public ResolveResult resolve(String did) {
         return resolve(did, ResolveOptions.defaults());
     }
 
+    /**
+     * Resolves a did:webvh DID over HTTPS with the given options.
+     *
+     * @param did     the DID to resolve; may include query parameters ({@code ?versionId=...})
+     * @param options version selection and witness fetch configuration
+     * @return the resolved document and metadata
+     */
     public ResolveResult resolve(String did, ResolveOptions options) {
         DidWebVhUrl parsed = DidWebVhUrl.parse(did);
         String baseDid = parsed.toBaseDid();
@@ -67,15 +92,36 @@ public class DidResolver {
                 () -> fetchRequiredWitness(baseDid));
     }
 
+    /**
+     * Resolves a DID log from a local file without any network access.
+     *
+     * @param didLogPath path to the {@code did.jsonl} file
+     * @return the resolved document and metadata
+     */
     public ResolveResult resolveFromFile(Path didLogPath) {
         return logProcessor.process(fileFetcher.fetchDidLog(didLogPath), null, null,
                 ResolveOptions.defaults());
     }
 
+    /**
+     * Resolves a DID from an in-memory JSONL log string using default options.
+     *
+     * @param rawJsonl newline-delimited log entries ({@code did.jsonl} content)
+     * @param did      the DID string to validate against the log, or {@code null} to skip DID check
+     * @return the resolved document and metadata
+     */
     public ResolveResult resolveFromLog(String rawJsonl, String did) {
         return resolveFromLog(rawJsonl, did, ResolveOptions.defaults());
     }
 
+    /**
+     * Resolves a DID from an in-memory JSONL log string with the given options.
+     *
+     * @param rawJsonl newline-delimited log entries ({@code did.jsonl} content)
+     * @param did      the DID string to validate against the log, or {@code null} to skip DID check
+     * @param options  version selection and witness fetch configuration
+     * @return the resolved document and metadata
+     */
     public ResolveResult resolveFromLog(String rawJsonl, String did, ResolveOptions options) {
         return logProcessor.process(rawJsonl, null, did, options);
     }

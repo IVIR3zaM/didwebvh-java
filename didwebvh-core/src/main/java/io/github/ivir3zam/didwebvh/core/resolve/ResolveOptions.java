@@ -15,26 +15,32 @@ public final class ResolveOptions {
         this.witnessFetchMode = builder.witnessFetchMode;
     }
 
+    /** Returns a new builder for {@link ResolveOptions}. */
     public static Builder builder() {
         return new Builder();
     }
 
+    /** Returns a {@link ResolveOptions} with no version selector and proactive witness fetch. */
     public static ResolveOptions defaults() {
         return builder().build();
     }
 
+    /** Returns the versionId selector, or {@code null} if not set. */
     public String getVersionId() {
         return versionId;
     }
 
+    /** Returns the versionTime selector, or {@code null} if not set. */
     public String getVersionTime() {
         return versionTime;
     }
 
+    /** Returns the versionNumber selector, or {@code null} if not set. */
     public Integer getVersionNumber() {
         return versionNumber;
     }
 
+    /** Returns the witness fetch mode. */
     public WitnessFetchMode getWitnessFetchMode() {
         return witnessFetchMode;
     }
@@ -83,27 +89,32 @@ public final class ResolveOptions {
         private Builder() {
         }
 
+        /** Selects a specific DID log entry by its full versionId string. */
         public Builder versionId(String versionId) {
             this.versionId = versionId;
             return this;
         }
 
+        /** Selects the log entry that was active at the given ISO 8601 UTC instant. */
         public Builder versionTime(String versionTime) {
             this.versionTime = versionTime;
             return this;
         }
 
+        /** Selects a specific DID log entry by its version number. */
         public Builder versionNumber(Integer versionNumber) {
             this.versionNumber = versionNumber;
             return this;
         }
 
+        /** Sets how witness proofs are fetched during HTTP resolution. */
         public Builder witnessFetchMode(WitnessFetchMode witnessFetchMode) {
             this.witnessFetchMode = witnessFetchMode == null
                     ? WitnessFetchMode.PROACTIVE : witnessFetchMode;
             return this;
         }
 
+        /** Builds and returns the {@link ResolveOptions}. */
         public ResolveOptions build() {
             return new ResolveOptions(this);
         }
