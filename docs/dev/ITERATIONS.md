@@ -90,7 +90,8 @@ Set up the multi-module Maven project structure, CI pipeline, and quality toolin
 - Maven wrapper pre-existed (3.9.9); reused as-is
 - JitPack repository added for `com.github.multiformats:java-multihash` (not on Maven Central)
 - SpotBugs 4.9.3 used; auto-skipped on JDK >= 22 via profile (ASM doesn't support class file major version 69)
-- `./mvnw clean verify` passes on local JDK 25 (SpotBugs skipped); CI matrix targets JDK 11/17/21/25
+- `./mvnw clean verify` passes on local JDK 25 with SpotBugs skipped; contributors and agents should use
+  JDK 21 for local full verification so SpotBugs runs before CI.
 
 ---
 

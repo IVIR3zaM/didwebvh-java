@@ -6,7 +6,8 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ### Prerequisites
 
-- **Java 11 or later** — we recommend [Eclipse Temurin](https://adoptium.net/) (LTS versions 11, 17, 21, or 25)
+- **Java 11 or later** — the library supports Java 11+, but contributors should use
+  [Eclipse Temurin 21](https://adoptium.net/) for local verification.
 - **Git**
 - That's it. Maven is included in the project via the Maven Wrapper (`mvnw`).
 
@@ -19,6 +20,20 @@ cd didwebvh-java
 ```
 
 This will compile all modules, run all tests, check code style, and generate coverage reports. If it passes, you're ready to contribute.
+
+Use JDK 21 when running the full local build. The CI matrix runs Java 11, 17, 21, and 25, but SpotBugs is
+skipped on JDK 22+ because the current SpotBugs toolchain does not support those class files. Running
+`./mvnw clean verify` on JDK 25 is useful as a smoke test, but it does not match the SpotBugs checks that run
+on the Java 11, 17, and 21 CI jobs.
+
+On macOS, after installing JDK 21:
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+./mvnw clean verify
+```
 
 ### IDE Setup
 
@@ -57,7 +72,7 @@ Open a GitHub Issue with the `enhancement` label. Describe the use case and why 
    ```bash
    ./mvnw clean verify
    ```
-   This must pass. It runs:
+   This must pass on JDK 21 before opening a PR. It runs:
    - Compilation (Java 11 target)
    - All unit and integration tests
    - Checkstyle (Google Java Style, 120 char line length)
@@ -78,6 +93,7 @@ Open a GitHub Issue with the `enhancement` label. Describe the use case and why 
 
 - PRs require at least one review before merging
 - CI must pass on all Java versions (11, 17, 21, 25)
+- Local pre-PR verification should use JDK 21 so SpotBugs runs before CI
 - Coverage should not decrease
 - Keep PRs focused — one feature or fix per PR
 

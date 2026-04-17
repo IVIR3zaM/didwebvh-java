@@ -127,6 +127,9 @@ didwebvh-java/
 ./mvnw clean verify
 ```
 
+Contributors should run the full build with JDK 21 for the closest local match to CI. The project supports
+Java 11+, and CI also checks Java 11, 17, and 25, but SpotBugs is skipped on JDK 22+ in this repository.
+
 ## Running Tests
 
 ```bash

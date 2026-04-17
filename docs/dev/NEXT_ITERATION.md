@@ -18,7 +18,7 @@ Process:
    - If all are [DONE], report that no work remains.
 
 2. Read only the files strictly needed for this iteration.
-   - Do not read or summarize entire repository documents unless required, but be aware of the fact that docs/AGNETS.md and docs/ARCHITECTURE.md files is important and read them if necessary.
+   - Do not read or summarize entire repository documents unless required, but be aware that docs/AGENTS.md and docs/ARCHITECTURE.md are important and read them if necessary.
    - If the spec PDF is needed, extract only the exact requirement needed and summarize it briefly in your own words.
 
 3. Before code changes, update only the single status line for the target iteration:
@@ -42,7 +42,9 @@ Process:
 
 7. Add or update tests for all new behavior.
 
-8. Assume verification with ./mvnw clean verify is required.
+8. Assume verification with ./mvnw clean verify is required, and use JDK 21 for that verification when possible.
+   SpotBugs is skipped on JDK 22+, so JDK 25 does not provide the same local signal as the Java 11, 17, and
+   21 CI jobs.
 
 9. After implementation, update only the target iteration section:
    - [IN PROGRESS] -> [DONE]
