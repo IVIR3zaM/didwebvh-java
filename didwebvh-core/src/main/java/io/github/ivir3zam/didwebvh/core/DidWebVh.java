@@ -1,7 +1,12 @@
 package io.github.ivir3zam.didwebvh.core;
 
 import io.github.ivir3zam.didwebvh.core.create.CreateDidConfig;
+import io.github.ivir3zam.didwebvh.core.model.LogEntry;
 import io.github.ivir3zam.didwebvh.core.signing.Signer;
+import io.github.ivir3zam.didwebvh.core.validate.LogChainValidator;
+import io.github.ivir3zam.didwebvh.core.validate.ValidationResult;
+
+import java.util.List;
 
 /**
  * Main entry point for the did:webvh library.
@@ -28,5 +33,16 @@ public final class DidWebVh {
      */
     public static CreateDidConfig create(String domain, Signer signer) {
         return new CreateDidConfig(domain, signer);
+    }
+
+    /**
+     * Validate a log chain against an expected DID.
+     *
+     * @param entries     the ordered list of log entries
+     * @param expectedDid the DID being resolved (may be {@code null} to skip id check)
+     * @return the validation result
+     */
+    public static ValidationResult validate(List<LogEntry> entries, String expectedDid) {
+        return new LogChainValidator().validate(entries, expectedDid);
     }
 }

@@ -28,11 +28,21 @@ public final class ProofVerifier {
      * @return {@code true} if the signature is valid
      */
     public static boolean verify(DataIntegrityProof proof, LogEntry logEntry) {
-        JsonObject json = ProofGenerator.toJsonWithoutProof(logEntry);
+        return verify(proof, ProofGenerator.toJsonWithoutProof(logEntry));
+    }
+
+    /**
+     * Verify a Data Integrity proof over an arbitrary JSON document.
+     *
+     * @param proof    the proof to verify
+     * @param document the JSON document that was signed (JCS-canonicalized internally)
+     * @return {@code true} if the signature is valid
+     */
+    public static boolean verify(DataIntegrityProof proof, JsonObject document) {
         String multikey = extractMultikey(proof.getVerificationMethod());
         byte[] publicKeyBytes = MultikeyUtil.decode(multikey);
 
-        byte[] canonical = Jcs.canonicalize(json);
+        byte[] canonical = Jcs.canonicalize(document);
         byte[] signature = Base58Btc.decodeMultibase(proof.getProofValue());
 
         Ed25519PublicKeyParameters publicKey =
@@ -59,7 +69,7 @@ public final class ProofVerifier {
     /**
      * Extract the multikey portion from a {@code did:key:<multikey>#<multikey>} URI.
      */
-    static String extractMultikey(String verificationMethod) {
+    public static String extractMultikey(String verificationMethod) {
         if (verificationMethod == null) {
             throw new ValidationException("verificationMethod is null");
         }

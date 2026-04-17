@@ -17,6 +17,21 @@ public final class WitnessConfig {
                 : Collections.unmodifiableList(witnesses);
     }
 
+    /**
+     * Return a config representing "no witnesses" ({@code witness: {}} in the spec).
+     *
+     * <p>Used as the default accumulated value for a chain that has never configured witnesses.
+     * A config is considered active only if {@link #getWitnesses()} is non-empty.
+     */
+    public static WitnessConfig empty() {
+        return new WitnessConfig(0, Collections.emptyList());
+    }
+
+    /** Return {@code true} if this config has at least one witness configured. */
+    public boolean isActive() {
+        return !witnesses.isEmpty();
+    }
+
     public int getThreshold() {
         return threshold;
     }

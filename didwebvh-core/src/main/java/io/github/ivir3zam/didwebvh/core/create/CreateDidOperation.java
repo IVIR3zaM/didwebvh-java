@@ -87,9 +87,9 @@ final class CreateDidOperation {
         if (config.getSigner() == null) {
             throw new ValidationException("signer is required");
         }
-        if (config.getTtl() != null && config.getTtl() <= 0) {
+        if (config.getTtl() != null && config.getTtl() < 0) {
             throw new ValidationException(
-                    "ttl must be positive, was " + config.getTtl());
+                    "ttl must be non-negative, was " + config.getTtl());
         }
         if (config.getNextKeyHashes() != null) {
             for (String hash : config.getNextKeyHashes()) {

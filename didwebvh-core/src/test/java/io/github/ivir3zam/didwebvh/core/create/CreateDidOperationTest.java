@@ -374,16 +374,15 @@ class CreateDidOperationTest {
                 DidWebVh.create("example.com", testSigner)
                         .ttl(-1).execute())
                 .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("ttl must be positive");
+                .hasMessageContaining("ttl must be non-negative");
     }
 
     @Test
-    void zeroTtlThrows() {
-        assertThatThrownBy(() ->
-                DidWebVh.create("example.com", testSigner)
-                        .ttl(0).execute())
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("ttl must be positive");
+    void zeroTtlMeansDoNotCache() {
+        // ttl=0 is valid per spec: "do not cache"
+        CreateDidResult result = DidWebVh.create("example.com", testSigner)
+                .ttl(0).execute();
+        assertThat(result.getLogEntry().getParameters().getTtl()).isEqualTo(0);
     }
 
     @Test

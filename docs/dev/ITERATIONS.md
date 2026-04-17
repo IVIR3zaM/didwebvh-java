@@ -517,7 +517,7 @@ Implement DID URL parsing and the DID-to-HTTPS transformation algorithm from spe
 
 ---
 
-## Iteration 7: Log Chain Validation `[NOT STARTED]`
+## Iteration 7: Log Chain Validation `[DONE]`
 
 ### Goal
 Implement the full log chain validation logic from spec section 3.6.2. This is the core security logic.
@@ -596,6 +596,20 @@ Implement the full log chain validation logic from spec section 3.6.2. This is t
 - Pre-rotation verification works correctly
 - Clear error messages for each type of validation failure
 - Validation is the most thoroughly tested component
+
+### Implementation Notes
+- Added `ValidationResult` and `WitnessValidationResult` value objects in `core.validate` package.
+- `LogChainValidator.validate()` starts accumulation from `Parameters.defaults()` so every resolved field reflects its spec default; deactivation is checked at the **top** of the loop (fast-fail before any crypto work).
+- `LogChainValidator` enforces: version-number monotonicity, SCID (first entry), entry-hash, Data Integrity proof (signature + authorization), versionTime ordering, parameter constraints (method/scid/updateKeys required in first entry; no scid/portable-escalation in later entries; witness threshold bounds; method semver monotonicity), pre-rotation hash matching, and deactivation finality.
+- Key-rotation entries are authorized with the **previous** active updateKeys; the new keys only take effect after the entry is fully validated.
+- `WitnessConfig.empty()` added as the spec's `witness: {}` sentinel; `isActive()` helper used everywhere to distinguish "witnesses configured" from "empty/default".
+- `WitnessValidator.validate()` verifies threshold-met witness proofs over `{"versionId":"…"}` documents; proofs from unknown witnesses are silently skipped.
+- `Parameters.defaults()` provides all spec section 3.7.1 defaults: `ttl=3600`, `portable=false`, `deactivated=false`, `witness=WitnessConfig.empty()`, `watchers=[]`.
+- `ttl=0` is a valid value meaning "do not cache"; `CreateDidOperation` validation changed from `<= 0` to `< 0` accordingly.
+- `ProofVerifier` extended with a public `verify(DataIntegrityProof, JsonObject)` overload and `extractMultikey` made `public`.
+- `DidWebVh.validate(entries, expectedDid)` facade added.
+- `validateParameters` private method uses named parameters `entryDelta` / `newActive` / `prevActive` for clarity.
+- 165 total tests; `./mvnw clean verify` passes on all modules.
 
 ---
 

@@ -116,6 +116,31 @@ public final class Parameters {
     }
 
     /**
+     * Return a new {@link Parameters} pre-populated with spec-defined defaults (section 3.7.1).
+     *
+     * <ul>
+     *   <li>{@code ttl} = 3600</li>
+     *   <li>{@code portable} = false</li>
+     *   <li>{@code deactivated} = false</li>
+     *   <li>{@code witness} = {@link WitnessConfig#empty()} (i.e. {@code {}}, no witnesses)</li>
+     *   <li>{@code watchers} = {@code []} (empty list, no watchers)</li>
+     * </ul>
+     *
+     * <p>Use this as the starting accumulator in a log-chain validation run so that
+     * optional parameters resolve to their correct spec defaults rather than {@code null}.
+     * Note: {@code ttl = 0} is a valid explicit value meaning "do not cache"; it is distinct
+     * from an unset TTL.
+     */
+    public static Parameters defaults() {
+        return new Parameters()
+                .setTtl(3600)
+                .setPortable(Boolean.FALSE)
+                .setDeactivated(Boolean.FALSE)
+                .setWitness(WitnessConfig.empty())
+                .setWatchers(Collections.emptyList());
+    }
+
+    /**
      * Apply {@code other}'s non-null fields on top of this instance, returning a new object.
      * {@code this} and {@code other} are left unmodified.
      */
