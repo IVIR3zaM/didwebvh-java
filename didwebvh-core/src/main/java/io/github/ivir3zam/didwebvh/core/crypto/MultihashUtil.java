@@ -48,7 +48,7 @@ public final class MultihashUtil {
         return digest;
     }
 
-    static byte[] sha256(byte[] data) {
+    public static byte[] sha256(byte[] data) {
         try {
             return MessageDigest.getInstance("SHA-256").digest(data);
         } catch (NoSuchAlgorithmException e) {

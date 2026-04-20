@@ -6,7 +6,6 @@ import io.github.ivir3zam.didwebvh.core.create.CreateDidResult;
 import io.github.ivir3zam.didwebvh.core.crypto.Base58Btc;
 import io.github.ivir3zam.didwebvh.core.crypto.EntryHashGenerator;
 
-import io.github.ivir3zam.didwebvh.core.crypto.Jcs;
 import io.github.ivir3zam.didwebvh.core.crypto.MultikeyUtil;
 import io.github.ivir3zam.didwebvh.core.crypto.PreRotationHashGenerator;
 import io.github.ivir3zam.didwebvh.core.model.DataIntegrityProof;
@@ -496,13 +495,13 @@ class LogChainValidatorTest {
     // ── helper: make a proof over a JsonObject (for witness tests) ────────────
 
     static DataIntegrityProof signDocument(Signer s, JsonObject doc) {
-        byte[] canonical = Jcs.canonicalize(doc);
-        byte[] signature = s.sign(canonical);
-        String proofValue = Base58Btc.encodeMultibase(signature);
-        return DataIntegrityProof.defaults()
+        DataIntegrityProof proof = DataIntegrityProof.defaults()
                 .setVerificationMethod(s.verificationMethod())
-                .setCreated(Instant.now().toString())
-                .setProofValue(proofValue);
+                .setCreated(Instant.now().toString());
+        byte[] hashData = io.github.ivir3zam.didwebvh.core.signing.ProofGenerator
+                .buildHashData(proof, doc);
+        byte[] signature = s.sign(hashData);
+        return proof.setProofValue(Base58Btc.encodeMultibase(signature));
     }
 
     @Test

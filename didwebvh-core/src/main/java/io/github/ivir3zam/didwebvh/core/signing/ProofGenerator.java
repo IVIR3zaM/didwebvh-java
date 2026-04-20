@@ -3,6 +3,7 @@ package io.github.ivir3zam.didwebvh.core.signing;
 import com.google.gson.JsonObject;
 import io.github.ivir3zam.didwebvh.core.crypto.Base58Btc;
 import io.github.ivir3zam.didwebvh.core.crypto.Jcs;
+import io.github.ivir3zam.didwebvh.core.crypto.MultihashUtil;
 import io.github.ivir3zam.didwebvh.core.model.DataIntegrityProof;
 import io.github.ivir3zam.didwebvh.core.model.JsonSupport;
 import io.github.ivir3zam.didwebvh.core.model.LogEntry;
@@ -31,15 +32,32 @@ public final class ProofGenerator {
      * @return a populated {@link DataIntegrityProof}
      */
     public static DataIntegrityProof generate(Signer signer, LogEntry logEntry) {
-        JsonObject json = toJsonWithoutProof(logEntry);
-        byte[] canonical = Jcs.canonicalize(json);
-        byte[] signature = signer.sign(canonical);
-        String proofValue = Base58Btc.encodeMultibase(signature);
-
-        return DataIntegrityProof.defaults()
+        DataIntegrityProof proof = DataIntegrityProof.defaults()
                 .setVerificationMethod(signer.verificationMethod())
-                .setCreated(ISO_UTC.format(Instant.now()))
-                .setProofValue(proofValue);
+                .setCreated(ISO_UTC.format(Instant.now()));
+
+        JsonObject doc = toJsonWithoutProof(logEntry);
+        byte[] hashData = buildHashData(proof, doc);
+        byte[] signature = signer.sign(hashData);
+        proof.setProofValue(Base58Btc.encodeMultibase(signature));
+        return proof;
+    }
+
+    /**
+     * Build the eddsa-jcs-2022 hash-to-sign:
+     * {@code SHA256(JCS(proofConfig)) || SHA256(JCS(document))}.
+     * proofConfig is the proof without {@code proofValue}.
+     */
+    public static byte[] buildHashData(DataIntegrityProof proof, JsonObject document) {
+        JsonObject proofConfig = JsonSupport.compact().toJsonTree(proof)
+                .getAsJsonObject();
+        proofConfig.remove("proofValue");
+        byte[] proofHash = MultihashUtil.sha256(Jcs.canonicalize(proofConfig));
+        byte[] docHash = MultihashUtil.sha256(Jcs.canonicalize(document));
+        byte[] out = new byte[proofHash.length + docHash.length];
+        System.arraycopy(proofHash, 0, out, 0, proofHash.length);
+        System.arraycopy(docHash, 0, out, proofHash.length, docHash.length);
+        return out;
     }
 
     /** Serialize a LogEntry to JsonObject with the {@code proof} key removed. */

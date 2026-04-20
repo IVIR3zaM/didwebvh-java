@@ -3,7 +3,6 @@ package io.github.ivir3zam.didwebvh.core.signing;
 import com.google.gson.JsonObject;
 import io.github.ivir3zam.didwebvh.core.ValidationException;
 import io.github.ivir3zam.didwebvh.core.crypto.Base58Btc;
-import io.github.ivir3zam.didwebvh.core.crypto.Jcs;
 import io.github.ivir3zam.didwebvh.core.crypto.MultikeyUtil;
 import io.github.ivir3zam.didwebvh.core.model.DataIntegrityProof;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -39,15 +38,16 @@ class ProofVerifierTest {
     }
 
     private DataIntegrityProof signDocument(JsonObject doc) {
-        byte[] canonical = Jcs.canonicalize(doc);
+        DataIntegrityProof proof = DataIntegrityProof.defaults()
+                .setVerificationMethod("did:key:" + multikey + "#" + multikey)
+                .setCreated(Instant.now().toString());
+        byte[] hashData = ProofGenerator.buildHashData(proof, doc);
         Ed25519Signer signer = new Ed25519Signer();
         signer.init(true, privKey);
-        signer.update(canonical, 0, canonical.length);
+        signer.update(hashData, 0, hashData.length);
         byte[] signature = signer.generateSignature();
-        return DataIntegrityProof.defaults()
-                .setVerificationMethod("did:key:" + multikey + "#" + multikey)
-                .setCreated(Instant.now().toString())
-                .setProofValue(Base58Btc.encodeMultibase(signature));
+        proof.setProofValue(Base58Btc.encodeMultibase(signature));
+        return proof;
     }
 
     @Test

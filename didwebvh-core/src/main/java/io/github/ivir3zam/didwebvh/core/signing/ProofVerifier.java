@@ -3,7 +3,6 @@ package io.github.ivir3zam.didwebvh.core.signing;
 import com.google.gson.JsonObject;
 import io.github.ivir3zam.didwebvh.core.ValidationException;
 import io.github.ivir3zam.didwebvh.core.crypto.Base58Btc;
-import io.github.ivir3zam.didwebvh.core.crypto.Jcs;
 import io.github.ivir3zam.didwebvh.core.crypto.MultikeyUtil;
 import io.github.ivir3zam.didwebvh.core.model.DataIntegrityProof;
 import io.github.ivir3zam.didwebvh.core.model.LogEntry;
@@ -42,14 +41,14 @@ public final class ProofVerifier {
         String multikey = extractMultikey(proof.getVerificationMethod());
         byte[] publicKeyBytes = MultikeyUtil.decode(multikey);
 
-        byte[] canonical = Jcs.canonicalize(document);
+        byte[] hashData = ProofGenerator.buildHashData(proof, document);
         byte[] signature = Base58Btc.decodeMultibase(proof.getProofValue());
 
         Ed25519PublicKeyParameters publicKey =
                 new Ed25519PublicKeyParameters(publicKeyBytes, 0);
         Ed25519Signer verifier = new Ed25519Signer();
         verifier.init(false, publicKey);
-        verifier.update(canonical, 0, canonical.length);
+        verifier.update(hashData, 0, hashData.length);
         return verifier.verifySignature(signature);
     }
 

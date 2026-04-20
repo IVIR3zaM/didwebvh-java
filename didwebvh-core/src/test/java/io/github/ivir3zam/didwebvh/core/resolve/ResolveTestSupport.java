@@ -3,7 +3,6 @@ package io.github.ivir3zam.didwebvh.core.resolve;
 import com.google.gson.JsonObject;
 import io.github.ivir3zam.didwebvh.core.crypto.Base58Btc;
 import io.github.ivir3zam.didwebvh.core.crypto.EntryHashGenerator;
-import io.github.ivir3zam.didwebvh.core.crypto.Jcs;
 import io.github.ivir3zam.didwebvh.core.crypto.MultikeyUtil;
 import io.github.ivir3zam.didwebvh.core.model.DataIntegrityProof;
 import io.github.ivir3zam.didwebvh.core.model.LogEntry;
@@ -56,12 +55,13 @@ final class ResolveTestSupport {
     }
 
     static DataIntegrityProof signDocument(Signer signer, JsonObject doc) {
-        byte[] canonical = Jcs.canonicalize(doc);
-        byte[] signature = signer.sign(canonical);
-        return DataIntegrityProof.defaults()
+        DataIntegrityProof proof = DataIntegrityProof.defaults()
                 .setVerificationMethod(signer.verificationMethod())
-                .setCreated(Instant.now().toString())
-                .setProofValue(Base58Btc.encodeMultibase(signature));
+                .setCreated(Instant.now().toString());
+        byte[] hashData = io.github.ivir3zam.didwebvh.core.signing.ProofGenerator
+                .buildHashData(proof, doc);
+        byte[] signature = signer.sign(hashData);
+        return proof.setProofValue(Base58Btc.encodeMultibase(signature));
     }
 
     static Signer makeTestSigner() {
