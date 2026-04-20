@@ -101,11 +101,15 @@ Built-in implementations:
 
 ## Wizard CLI
 
-Run the interactive wizard to create and manage DIDs:
+Build the shaded (uber) jar, then run the interactive wizard:
 
 ```bash
-java -jar didwebvh-wizard.jar
+./mvnw -pl didwebvh-wizard -am package
+java -jar didwebvh-wizard/target/didwebvh-wizard-0.1.0-SNAPSHOT-shaded.jar
 ```
+
+(`-am` builds the `didwebvh-core` and `didwebvh-signing-local` dependencies first; the
+`-shaded` classifier is the self-contained jar produced by `maven-shade-plugin`.)
 
 The wizard supports:
 1. **Create** a new did:webvh DID
