@@ -166,7 +166,7 @@ class LogProcessorTest {
                 create.getLogEntry().getVersionId(), witness);
 
         ResolveResult result = processor.process(create.getLogLine(),
-                JsonSupport.compact().toJson(proofs), create.getDid(),
+                JsonSupport.compact().toJson(proofs.getEntries()), create.getDid(),
                 ResolveOptions.defaults());
 
         assertThat(result.getDidDocument().getId()).isEqualTo(create.getDid());

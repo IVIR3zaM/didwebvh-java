@@ -15,6 +15,8 @@ import io.github.ivir3zam.didwebvh.core.validate.ValidationResult;
 import io.github.ivir3zam.didwebvh.core.validate.WitnessValidationResult;
 import io.github.ivir3zam.didwebvh.core.validate.WitnessValidator;
 import io.github.ivir3zam.didwebvh.core.witness.WitnessProofCollection;
+import io.github.ivir3zam.didwebvh.core.witness.WitnessProofEntry;
+import com.google.gson.reflect.TypeToken;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -119,7 +121,9 @@ class LogProcessor {
 
         WitnessProofCollection proofs;
         try {
-            proofs = JsonSupport.compact().fromJson(witnessContent, WitnessProofCollection.class);
+            List<WitnessProofEntry> entries2 = JsonSupport.compact().fromJson(witnessContent,
+                    new TypeToken<List<WitnessProofEntry>>() { }.getType());
+            proofs = new WitnessProofCollection(entries2);
         } catch (JsonSyntaxException e) {
             throw new ResolutionException("Unable to parse witness proofs: "
                     + e.getMessage(), "invalidDid", e);

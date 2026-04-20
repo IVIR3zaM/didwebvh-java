@@ -109,7 +109,7 @@ class DidResolverTest {
         WitnessProofCollection proofs = witnessProofs(
                 create.getLogEntry().getVersionId(), witness);
         StubRemoteDidFetcher fetcher = new StubRemoteDidFetcher(create.getLogLine(),
-                JsonSupport.compact().toJson(proofs));
+                JsonSupport.compact().toJson(proofs.getEntries()));
         DidResolver resolver = new DidResolver(fetcher, new FileDidFetcher(),
                 new LogProcessor());
 
