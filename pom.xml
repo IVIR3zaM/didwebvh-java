@@ -11,6 +11,37 @@
 
     <name>didwebvh-java</name>
     <description>Java implementation of the did:webvh DID method</description>
+    <url>https://github.com/IVIR3zaM/didwebvh-java</url>
+    <inceptionYear>2026</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>ivir3zam</id>
+            <name>Reza Maghoul</name>
+            <email>m.reza.maghool@gmail.com</email>
+            <url>https://github.com/IVIR3zaM</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/IVIR3zaM/didwebvh-java.git</connection>
+        <developerConnection>scm:git:git@github.com:IVIR3zaM/didwebvh-java.git</developerConnection>
+        <url>https://github.com/IVIR3zaM/didwebvh-java</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/IVIR3zaM/didwebvh-java/issues</url>
+    </issueManagement>
 
     <modules>
         <module>didwebvh-core</module>
@@ -169,6 +200,15 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${failsafe.version}</version>
+                    <executions>
+                        <execution>
+                            <id>integration-tests</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -180,6 +220,21 @@
                             <goals>
                                 <goal>prepare-agent</goal>
                             </goals>
+                        </execution>
+                        <execution>
+                            <id>prepare-agent-integration</id>
+                            <goals>
+                                <goal>prepare-agent-integration</goal>
+                            </goals>
+                            <configuration>
+                                <!--
+                                  Append IT coverage to the same jacoco.exec as
+                                  the unit tests so the single `report` step
+                                  covers both surefire and failsafe runs.
+                                -->
+                                <destFile>${project.build.directory}/jacoco.exec</destFile>
+                                <append>true</append>
+                            </configuration>
                         </execution>
                         <execution>
                             <id>report</id>
@@ -243,6 +298,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.6.3</version>
+                    <configuration>
+                        <doclint>none</doclint>
+                        <quiet>true</quiet>
+                        <failOnWarnings>false</failOnWarnings>
+                        <source>${maven.compiler.source}</source>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
@@ -252,6 +313,17 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>3.2.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.7.0</version>
+                    <extensions>true</extensions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -259,6 +331,10 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -281,6 +357,64 @@
             <properties>
                 <spotbugs.skip>true</spotbugs.skip>
             </properties>
+        </profile>
+
+        <!--
+          Release profile for Maven Central publishing via Sonatype Central Portal.
+          Activated only during release builds (e.g. ./mvnw deploy -P release).
+          Attaches source + javadoc jars, signs all artifacts with GPG, and publishes
+          to https://central.sonatype.com. Requires the GitHub secrets described in
+          .github/workflows/release.yml.
+        -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <!--
+                              The wizard is shipped as a GitHub Release asset, not a
+                              Maven Central artifact (it's a CLI uber-jar).
+                            -->
+                            <excludeArtifacts>
+                                <excludeArtifact>didwebvh-wizard</excludeArtifact>
+                            </excludeArtifacts>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

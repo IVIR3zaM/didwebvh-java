@@ -2,6 +2,11 @@ package io.github.ivir3zam.didwebvh.core.crypto;
 
 import io.github.novacrypto.base58.Base58;
 
+/**
+ * Base58 (Bitcoin alphabet) encoding with optional Multibase {@code z}-prefix
+ * framing, as used throughout the did:webvh spec for SCIDs, entry hashes,
+ * and {@code publicKeyMultibase} values.
+ */
 public final class Base58Btc {
 
     private static final char MULTIBASE_PREFIX = 'z';

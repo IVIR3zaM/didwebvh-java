@@ -1028,7 +1028,7 @@ Add test vectors from the spec examples and from the Rust implementation. Ensure
 
 ---
 
-## Iteration 13: Quality, CI Finalization, and Documentation `[NOT STARTED]`
+## Iteration 13: Quality, CI Finalization, and Documentation `[DONE]`
 
 ### Goal
 Finalize CI badges, quality gates, documentation, and prepare for first release.
@@ -1172,6 +1172,74 @@ Finalize CI badges, quality gates, documentation, and prepare for first release.
 - Maven Central publishing is configured with the `release` profile
 - Release workflow exists and references all 4 required GitHub secrets (`GPG_PRIVATE_KEY`, `GPG_PASSPHRASE`, `OSSRH_USERNAME`, `OSSRH_TOKEN`)
 - Tagging `v0.1.0` and pushing triggers the full release pipeline
+
+### Implementation Notes
+- Added Maven Central publishing metadata to the parent `pom.xml`: `<url>`,
+  `<licenses>` (Apache-2.0), `<developers>`, `<scm>`, and `<issueManagement>`
+  — the minimum required by the Sonatype Central portal. Registered
+  `maven-gpg-plugin` 3.2.4 and `central-publishing-maven-plugin` 0.7.0 in
+  `<pluginManagement>` and configured the existing `maven-javadoc-plugin`
+  with `<doclint>none</doclint>` / `<failOnWarnings>false</failOnWarnings>`
+  so the javadoc JAR still builds across JDK 11–25 without tightening
+  every getter/builder in the core module.
+- Introduced a `release` profile that attaches source + javadoc JARs,
+  signs all artifacts with GPG loopback-pinentry, and deploys via the
+  Sonatype Central plugin (`<publishingServerId>central</publishingServerId>`,
+  `<autoPublish>true</autoPublish>`). The wizard module is excluded from
+  Central — it is an uber-jar CLI published only as a GitHub Release
+  asset — using the plugin's `<excludeArtifacts>` list. The profile is
+  opt-in (`-P release`) so `./mvnw verify` in day-to-day development stays
+  unchanged. Smoke-tested locally with `-Dgpg.skip=true -DskipTests`: core
+  and signing-local produce the three Central-required JARs
+  (`-sources`, `-javadoc`, main).
+- Added `.github/workflows/release.yml`: triggers on `v*` tag push, uses
+  `actions/setup-java@v4` with `server-id: central` so the step writes
+  the `~/.m2/settings.xml` mapping `OSSRH_USERNAME` / `OSSRH_TOKEN` env
+  vars to the `central` server, imports `GPG_PRIVATE_KEY`, and runs
+  `./mvnw clean deploy -P release -B --no-transfer-progress -DskipTests`.
+  `softprops/action-gh-release@v2` then attaches `didwebvh-core/target/*.jar`
+  and `didwebvh-wizard/target/*-shaded.jar` to the generated GitHub
+  Release. The four required repo secrets are documented inline in the
+  workflow body and in the iteration description above.
+- Added class-level Javadoc to the seven `crypto` utility classes that
+  were missing it (`Base58Btc`, `Jcs`, `EntryHashGenerator`,
+  `ScidGenerator`, `MultihashUtil`, `MultikeyUtil`,
+  `PreRotationHashGenerator`), each briefly citing the spec section the
+  code implements. The top-level facade (`DidWebVh`) and main model /
+  builder classes already carried usable Javadoc; `<doclint>none</doclint>`
+  keeps the release build from failing on getter-level gaps that are
+  self-documenting.
+- Rewrote the README's Quick Start to match the real API (`DidWebVh.create
+  (domain, signer)` rather than the pre-iter-5 `.withSigner` builder,
+  `DidWebVhState.fromDidLog` for reload, real package name for
+  `LocalKeySigner`) and added dedicated Changelog, Contributing, and
+  Security sections pointing at `CHANGELOG.md`, `CONTRIBUTING.md`, and
+  `SECURITY.md`.
+- Created `CHANGELOG.md` (Keep a Changelog 1.1.0 format, SemVer) with a
+  complete `0.1.0` entry summarising every public feature delivered
+  across iterations 1–13, and `SECURITY.md` describing the private
+  vulnerability reporting channels (GitHub private advisory + email),
+  response-time expectations, and scope (in/out).
+- Added `codecov.yml` at the repo root pinning the project + patch
+  coverage target to 80 % (threshold 1 %), ignoring `target/`, `test/`,
+  and the wizard module so Codecov reflects the same core-first contract
+  the CI enforces.
+- No existing Checkstyle / SpotBugs violations were found; JaCoCo core
+  coverage stayed at 83 % (above the 80 % bar) without new tests being
+  needed — `./mvnw clean verify` remains green on every module after the
+  doc / metadata changes.
+- Wired `maven-failsafe-plugin` into the parent POM (bound to the
+  `integration-test` + `verify` goals, listed under
+  `<build><plugins>`) so the `*IT` classes in
+  `didwebvh-core/src/test/java/.../integration/` (notably
+  `SpecComplianceIT`'s 18 MUST tests) actually run during `./mvnw verify`
+  — they were previously dormant because Surefire excludes `*IT` by
+  convention and Failsafe wasn't configured. Added a second JaCoCo
+  execution (`prepare-agent-integration`) that appends to the same
+  `jacoco.exec` as the unit-test agent, so the single `report` step
+  covers both runs; core instruction coverage rose from 83 % → 84 %.
+  CI picks this up automatically because
+  `.github/workflows/ci.yml` already runs `./mvnw clean verify -B`.
 
 ---
 

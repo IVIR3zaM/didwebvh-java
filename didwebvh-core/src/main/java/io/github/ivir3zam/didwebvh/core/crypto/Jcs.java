@@ -7,6 +7,11 @@ import org.erdtman.jcs.JsonCanonicalizer;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * JSON Canonicalization Scheme (RFC 8785) helper. Used everywhere the
+ * spec requires a deterministic byte representation of a JSON value —
+ * entry-hash input, proof-input, and the SCID placeholder step.
+ */
 public final class Jcs {
 
     private Jcs() {

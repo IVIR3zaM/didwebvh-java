@@ -3,6 +3,12 @@ package io.github.ivir3zam.didwebvh.core.crypto;
 import io.github.ivir3zam.didwebvh.core.model.LogEntry;
 import io.github.ivir3zam.didwebvh.core.model.Parameters;
 
+/**
+ * Derives the SCID (Self-Certifying IDentifier) of a did:webvh DID from
+ * a preliminary first log entry per spec §3.3: substitute the
+ * {@code {SCID}} placeholder, JCS-canonicalize, then apply
+ * {@code sha2-256} multihash with base58btc multibase encoding.
+ */
 public final class ScidGenerator {
 
     static final String SCID_PLACEHOLDER = "{SCID}";

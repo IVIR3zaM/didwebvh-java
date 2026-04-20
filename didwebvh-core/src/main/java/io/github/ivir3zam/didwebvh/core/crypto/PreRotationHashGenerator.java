@@ -2,6 +2,11 @@ package io.github.ivir3zam.didwebvh.core.crypto;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Computes the pre-rotation commitment hash for a future key: the
+ * multihash+multibase of the UTF-8 bytes of the multikey string.
+ * See spec §3.5 (pre-rotation).
+ */
 public final class PreRotationHashGenerator {
 
     private PreRotationHashGenerator() {

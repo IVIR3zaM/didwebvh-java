@@ -4,6 +4,12 @@ import com.google.gson.JsonObject;
 import io.github.ivir3zam.didwebvh.core.model.JsonSupport;
 import io.github.ivir3zam.didwebvh.core.model.LogEntry;
 
+/**
+ * Computes the entry-hash portion of a did:webvh {@code versionId}
+ * ({@code <versionNumber>-<entryHash>}) per spec §4.2: strip the proof,
+ * substitute the predecessor {@code versionId}, JCS-canonicalize, then
+ * apply {@code sha2-256} multihash with base58btc multibase encoding.
+ */
 public final class EntryHashGenerator {
 
     private EntryHashGenerator() {

@@ -47,40 +47,52 @@ implementation 'io.github.ivir3zam:didwebvh-java:0.1.0'
 
 ```java
 import io.github.ivir3zam.didwebvh.core.DidWebVh;
-import io.github.ivir3zam.didwebvh.signing.LocalKeySigner;
+import io.github.ivir3zam.didwebvh.core.create.CreateDidResult;
+import io.github.ivir3zam.didwebvh.signing.local.LocalKeySigner;
 
-// Generate a signing key
+// Generate a signing key (or load one from disk with LocalKeySigner.load(path))
 LocalKeySigner signer = LocalKeySigner.generate();
 
-// Create a new DID
-CreateDidResult result = DidWebVh.create("example.com")
-    .withSigner(signer)
-    .execute();
+CreateDidResult result = DidWebVh.create("example.com", signer)
+        .portable(true)
+        .ttl(3600)
+        .execute();
 
 System.out.println("DID: " + result.getDid());
-System.out.println("Log: " + result.getLogEntry().toJsonLine());
+System.out.println("Log line: " + result.getLogLine());
 ```
 
 ### Resolve a DID
 
 ```java
 import io.github.ivir3zam.didwebvh.core.DidWebVh;
+import io.github.ivir3zam.didwebvh.core.model.ResolveResult;
 
 ResolveResult result = DidWebVh.resolve("did:webvh:QmSCID:example.com");
 
 System.out.println("DID Document: " + result.getDidDocument());
-System.out.println("Metadata: " + result.getMetadata());
+System.out.println("Metadata:    : " + result.getResolutionMetadata());
 ```
 
-### Update a DID
+### Update, Migrate, or Deactivate
 
 ```java
 import io.github.ivir3zam.didwebvh.core.DidWebVh;
+import io.github.ivir3zam.didwebvh.core.DidWebVhState;
+import io.github.ivir3zam.didwebvh.core.update.UpdateDidResult;
 
-UpdateResult result = DidWebVh.update(existingState)
-    .withDocument(updatedDocument)
-    .withSigner(signer)
-    .execute();
+// Reload state from the on-disk did.jsonl (or reuse a freshly created one):
+DidWebVhState state = DidWebVhState.fromDidLog(did, didLogJsonl);
+
+UpdateDidResult updated = DidWebVh.update(state, signer)
+        .newDocument(updatedDoc)
+        .execute();
+
+// Migrate a portable DID to a new domain:
+DidWebVh.migrate(state, signer, "new.example.com").execute();
+
+// Deactivate:
+DidWebVh.deactivate(state, signer).execute();
 ```
 
 ## Pluggable Key Management
@@ -140,14 +152,39 @@ Java 11+, and CI also checks Java 11, 17, and 25, but SpotBugs is skipped on JDK
 ./mvnw test
 ```
 
-## License
-
-[Apache License 2.0](LICENSE)
-
 ## Specification
 
 This library implements the [did:webvh DID Method v1.0](https://identity.foundation/didwebvh/v1.0/) specification.
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
+
 ## Contributing
 
-See [AGENTS.md](docs/AGENTS.md) for contributor and AI agent guidelines, and [ARCHITECTURE.md](docs/ARCHITECTURE.md) for technical design decisions.
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md)
+for the development workflow, and
+[docs/AGENTS.md](docs/AGENTS.md) /
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for contributor (and AI agent)
+guidelines and the technical design.
+
+Before opening a PR, run:
+
+```bash
+./mvnw clean verify
+```
+
+This runs the full test suite, Checkstyle, SpotBugs, and JaCoCo coverage
+checks across all modules.
+
+## Security
+
+If you believe you've found a security vulnerability, please follow the
+instructions in [SECURITY.md](SECURITY.md) — **do not** open a public
+GitHub issue.
+
+## License
+
+Licensed under the [Apache License, Version 2.0](LICENSE). By contributing
+to this project you agree to license your contributions under the same
+terms.

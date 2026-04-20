@@ -2,6 +2,11 @@ package io.github.ivir3zam.didwebvh.core.crypto;
 
 import io.github.ivir3zam.didwebvh.core.ValidationException;
 
+/**
+ * Encodes and decodes W3C Multikey public keys
+ * ({@code z<base58btc(<varint-codec> || <raw-key>)>}). Only Ed25519
+ * (codec {@code 0xed01}) is supported today — matching did:webvh v1.0.
+ */
 public final class MultikeyUtil {
 
     private static final byte[] ED25519_PREFIX = new byte[]{(byte) 0xed, 0x01};

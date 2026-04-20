@@ -5,6 +5,10 @@ import io.github.ivir3zam.didwebvh.core.ValidationException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Multihash (varint prefix) + base58btc multibase helpers used for SCID and
+ * entry-hash encoding in did:webvh. Currently hard-wired to {@code sha2-256}.
+ */
 public final class MultihashUtil {
 
     public static final int SHA2_256_CODE = 0x12;
