@@ -11,6 +11,7 @@ import io.github.ivir3zam.didwebvh.core.model.VersionId;
 import io.github.ivir3zam.didwebvh.core.signing.ProofVerifier;
 import io.github.ivir3zam.didwebvh.core.witness.WitnessConfig;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -154,8 +155,10 @@ public final class LogChainValidator {
             previousVersionTime = vt;
         }
 
-        // Last entry's versionTime must not be in the future
-        if (previousVersionTime != null && previousVersionTime.isAfter(Instant.now())) {
+        // Last entry's versionTime must not be in the future. Allow small skew since
+        // versionTime is second-precision and rapid updates may bump by 1s to stay strictly increasing.
+        if (previousVersionTime != null
+                && previousVersionTime.isAfter(Instant.now().plus(Duration.ofSeconds(60)))) {
             return ValidationResult.failure(entries.size() - 2, entries.size() - 1,
                     "last entry versionTime is in the future", activeParams);
         }

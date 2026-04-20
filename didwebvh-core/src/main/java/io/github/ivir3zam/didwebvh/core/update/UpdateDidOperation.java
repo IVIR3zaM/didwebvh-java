@@ -10,6 +10,7 @@ import io.github.ivir3zam.didwebvh.core.signing.ProofGenerator;
 import io.github.ivir3zam.didwebvh.core.signing.Signer;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
 /**
@@ -51,7 +52,12 @@ final class UpdateDidOperation {
 
         Parameters params = changedParams != null ? changedParams : new Parameters();
 
-        String versionTime = Instant.now().toString();
+        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        Instant prev = Instant.parse(previous.getVersionTime());
+        if (!now.isAfter(prev)) {
+            now = prev.plusSeconds(1);
+        }
+        String versionTime = now.toString();
         LogEntry entry = new LogEntry()
                 .setVersionId(predecessorVersionId)
                 .setVersionTime(versionTime)
