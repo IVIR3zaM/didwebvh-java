@@ -12,7 +12,7 @@ This is a Java 11+ library implementing the [did:webvh v1.0 specification](https
 2. **SOLID, but not academic.** Single Responsibility and Dependency Inversion are key (the `Signer` interface is a good example). Don't create interfaces for things that will only ever have one implementation.
 3. **Java 11 baseline.** No `var` in public API. No records. No sealed classes. Use standard Java 11 features. Dependencies must also support Java 11.
    Newer JDKs may run the library, but code must remain Java 11-compatible.
-4. **Spec fidelity.** The spec PDF (`docs/spec/Webvh v1.0.pdf`) is the source of truth. When in doubt, follow the spec literally. Reference spec section numbers in code comments for non-obvious logic.
+4. **Spec fidelity.** The spec TXT (`docs/spec/Webvh v1.0.txt`) is the source of truth. When in doubt, follow the spec literally. Reference spec section numbers in code comments for non-obvious logic.
 5. **Test-driven.** Every public method must have tests. Spec-related logic (SCID generation, entry hash verification, log chain validation) must have tests against known test vectors.
 
 ## Repository Structure

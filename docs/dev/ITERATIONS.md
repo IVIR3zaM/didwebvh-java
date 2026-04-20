@@ -2,7 +2,7 @@
 
 This file contains the ordered, detailed prompts for each step of building `didwebvh-java` from scratch to production-ready. Each iteration builds on the previous ones. An AI agent or human can execute them sequentially.
 
-Read `docs/AGENTS.md` and `docs/ARCHITECTURE.md` before starting. The spec PDF (`docs/spec/Webvh v1.0.pdf`) is the authoritative reference.
+Read `docs/AGENTS.md` and `docs/ARCHITECTURE.md` before starting. The spec TXT (`docs/spec/Webvh v1.0.txt`) is the authoritative reference.
 
 ### Status Key
 
