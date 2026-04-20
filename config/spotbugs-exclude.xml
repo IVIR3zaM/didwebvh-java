@@ -17,6 +17,7 @@
             <Class name="io.github.ivir3zam.didwebvh.core.update.UpdateDidConfig"/>
             <Class name="io.github.ivir3zam.didwebvh.core.update.MigrateDidConfig"/>
             <Class name="io.github.ivir3zam.didwebvh.core.update.DeactivateDidConfig"/>
+            <Class name="io.github.ivir3zam.didwebvh.wizard.ConsoleWizardIo"/>
         </Or>
     </Match>
 </FindBugsFilter>

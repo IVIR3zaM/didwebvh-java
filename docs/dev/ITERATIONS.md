@@ -834,7 +834,7 @@ Implement the parallel did:web document generation from spec section 3.7.10.
 
 ---
 
-## Iteration 11: Interactive Wizard CLI `[NOT STARTED]`
+## Iteration 11: Interactive Wizard CLI `[DONE]`
 
 ### Goal
 Build an interactive CLI wizard in the `didwebvh-wizard` module, similar to the Rust implementation.
@@ -906,6 +906,40 @@ Build an interactive CLI wizard in the `didwebvh-wizard` module, similar to the 
 - Resolve flow shows formatted output
 - Deactivation requires confirmation
 - Non-interactive mode works for CI/testing
+
+### Implementation Notes
+- Added nine classes in `didwebvh-wizard/src/main/java/io/github/ivir3zam/didwebvh/wizard/`:
+  `WizardIo` (abstraction over stdin/stdout), `ConsoleWizardIo` (JLine-backed implementation),
+  `WizardException`, `WizardPrompts` (shared input parsers for yes/no, ints, multi-line JSON,
+  comma-separated lists), `WizardFiles` (read/write `did.jsonl`, `did-secrets.json`,
+  `did-witness.json`), `CreateWizard`, `UpdateWizard`, `ResolveWizard`, and `WizardMain`
+  (picocli entry point with the top-level menu).
+- `WizardIo` is intentionally an interface, not a fixed `System.in/out` hookup, so every
+  wizard flow is driven by a scripted I/O in tests — no interactive prompts in CI.
+  `ScriptedWizardIo` in the test sources replays pre-staged lines and captures output for
+  assertions.
+- `CreateWizard` covers the full option surface: domain + path, generate or import a
+  signing key, optional services block (parsed as JSON), controller, `alsoKnownAs`,
+  `portable`, pre-rotation next-key generation, witnesses (collect DIDs + threshold),
+  watchers, and `ttl`. Saves `did.jsonl`, `did-secrets.json`, and (when applicable)
+  `did-witness.json` to a caller-chosen directory.
+- `UpdateWizard` loads an existing `did.jsonl` + `did-secrets.json` into a
+  `DidWebVhState`, then dispatches to **Modify** (pass-through to
+  `DidWebVh.update()`), **Migrate** (`DidWebVh.migrate()` with the new domain), or
+  **Deactivate** (`DidWebVh.deactivate()` with an explicit `"DEACTIVATE"` confirmation
+  prompt). The new entry is appended to `did.jsonl` in place.
+- `ResolveWizard` accepts a DID and optional `versionId` / `versionTime` /
+  `versionNumber`, calls `DidWebVh.resolve()`, and pretty-prints the resolved
+  `DidDocument` and `ResolutionMetadata`.
+- `didwebvh-wizard/pom.xml` adds `maven-shade-plugin` 3.5.2 producing a
+  `didwebvh-wizard-<version>-shaded.jar` classifier with `WizardMain` as the manifest
+  main class, so the wizard runs via `java -jar`. `ConsoleWizardIo` is added to
+  `config/spotbugs-exclude.xml` for the expected EI_EXPOSE_REP2 pattern
+  (PrintStream/BufferedReader are intentionally stored by reference).
+- 13 new wizard tests (`CreateWizardTest`, `UpdateWizardTest`, `ResolveWizardTest`,
+  `WizardMainTest`) exercise the full create/update/migrate/deactivate/resolve flows
+  through scripted I/O. `./mvnw clean verify` passes on all four modules (245 total
+  tests).
 
 ---
 
