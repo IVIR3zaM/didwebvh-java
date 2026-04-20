@@ -778,7 +778,7 @@ Implement all update operations from spec section 3.6.3 and deactivation from se
 
 ---
 
-## Iteration 10: did:web Parallel Publishing `[NOT STARTED]`
+## Iteration 10: did:web Parallel Publishing `[DONE]`
 
 ### Goal
 Implement the parallel did:web document generation from spec section 3.7.10.
@@ -807,6 +807,30 @@ Implement the parallel did:web document generation from spec section 3.7.10.
 - Parallel did:web document generation follows spec section 3.7.10
 - All DID references correctly converted
 - Implicit services injected
+
+### Implementation Notes
+- Added `DidWebPublisher` in `core.didweb` package with two public static methods:
+  `toDidWeb(DidDocument)` and `toDidWebUrl(String)`.
+- `toDidWeb()` takes a `DidDocument` directly rather than a `ResolveResult` — only the
+  resolved document is required for section 3.7.10, so the narrower type keeps the
+  contract honest and frees callers from wrapping a bare DIDDoc in a `ResolveResult`.
+- Flow follows spec section 3.7.10 literally: deep-copy the source DIDDoc → add implicit
+  `#files` and `#whois` services (skipped if either `#files`/`<did>#files` or
+  `#whois`/`<did>#whois` is already present) → text-replace `did:webvh:<SCID>:` with
+  `did:web:` across the serialized document → add the original did:webvh DID to
+  `alsoKnownAs`, dedupe, and drop the did:web self-DID if it landed there via the
+  replacement.
+- Implicit service endpoints are derived from the DID-to-HTTPS URL by stripping the
+  trailing `did.jsonl` filename and omitting the `.well-known/` segment when present;
+  `#whois` appends `whois.vp` to that base. `#files` uses `type: "relativeRef"`;
+  `#whois` uses `type: "LinkedVerifiablePresentation"` with the linked-vp `@context`.
+- `toDidWebUrl()` delegates to `DidToHttpsTransformer.toDidWebUrl()` (already implemented
+  in Iteration 6) so there is one canonical implementation of the DID-form conversion.
+- 12 new unit tests covering id/controller rewriting, verificationMethod reference
+  updates, implicit-service injection with path/port combinations, explicit-service
+  override (both `#files` and `<did>#files` id forms), `alsoKnownAs` preservation +
+  dedup + self-removal, and error cases. Total tests: 232 (224 core + 8 signing-local);
+  `./mvnw clean verify` passes.
 
 ---
 
