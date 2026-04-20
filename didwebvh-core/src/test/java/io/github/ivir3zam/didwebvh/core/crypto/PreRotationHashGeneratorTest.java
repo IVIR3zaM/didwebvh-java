@@ -7,14 +7,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PreRotationHashGeneratorTest {
 
     @Test
-    void generateHashProducesMultibaseResult() {
+    void generateHashProducesBase58btcResult() {
         byte[] publicKey = new byte[32];
         for (int i = 0; i < 32; i++) {
             publicKey[i] = (byte) (i + 1);
         }
         String multikey = MultikeyUtil.encode("Ed25519", publicKey);
         String hash = PreRotationHashGenerator.generateHash(multikey);
-        assertThat(hash).startsWith("z");
+        // Spec 3.7.7: base58btc(multihash(multikey)) — no multibase prefix.
+        // A SHA-256 multihash encoded in base58btc starts with "Qm" and is 46 chars.
+        assertThat(hash).hasSize(46).startsWith("Qm");
     }
 
     @Test

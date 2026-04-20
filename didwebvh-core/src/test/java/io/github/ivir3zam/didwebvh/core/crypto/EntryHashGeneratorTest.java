@@ -12,11 +12,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EntryHashGeneratorTest {
 
     @Test
-    void generateProducesMultibaseResult() {
+    void generateProducesBase58btcResult() {
         String json = "{\"versionId\":\"placeholder\",\"versionTime\":\"2024-01-01T00:00:00Z\","
                 + "\"parameters\":{},\"state\":{\"id\":\"did:example:123\"}}";
         String hash = EntryHashGenerator.generate(json, "predecessor-id");
-        assertThat(hash).startsWith("z");
+        // Spec 3.7.4: base58btc(multihash(JCS(entry))) — no multibase prefix.
+        // A SHA-256 multihash encoded in base58btc starts with "Qm" and is 46 chars.
+        assertThat(hash).hasSize(46).startsWith("Qm");
     }
 
     @Test

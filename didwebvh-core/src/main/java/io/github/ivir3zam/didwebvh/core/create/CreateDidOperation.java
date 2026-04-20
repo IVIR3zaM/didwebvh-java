@@ -12,6 +12,7 @@ import io.github.ivir3zam.didwebvh.core.signing.ProofGenerator;
 import io.github.ivir3zam.didwebvh.core.signing.Signer;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ final class CreateDidOperation {
         Parameters params = buildParameters(signerMultikey, config);
 
         // Step 4: Build preliminary log entry (no proof)
-        String versionTime = Instant.now().toString();
+        String versionTime = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString();
         LogEntry preliminary = new LogEntry()
                 .setVersionId(SCID_PLACEHOLDER)
                 .setVersionTime(versionTime)
@@ -89,11 +90,6 @@ final class CreateDidOperation {
                 if (hash == null || hash.isEmpty()) {
                     throw new ValidationException(
                             "nextKeyHashes entries must be non-empty");
-                }
-                if (!hash.startsWith("z")) {
-                    throw new ValidationException(
-                            "nextKeyHashes entries must be multibase-encoded"
-                                    + " (start with 'z'), got: " + hash);
                 }
             }
         }

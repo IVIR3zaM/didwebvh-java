@@ -15,7 +15,7 @@ public final class EntryHashGenerator {
         entry.addProperty("versionId", predecessorVersionId);
         byte[] canonical = Jcs.canonicalize(entry);
         byte[] multihash = MultihashUtil.hashAndEncode(canonical);
-        return Base58Btc.encodeMultibase(multihash);
+        return Base58Btc.encode(multihash);
     }
 
     public static boolean verify(LogEntry entry, String predecessorVersionId) {

@@ -10,6 +10,6 @@ public final class PreRotationHashGenerator {
     public static String generateHash(String multikeyPublicKey) {
         byte[] keyBytes = multikeyPublicKey.getBytes(StandardCharsets.UTF_8);
         byte[] multihash = MultihashUtil.hashAndEncode(keyBytes);
-        return Base58Btc.encodeMultibase(multihash);
+        return Base58Btc.encode(multihash);
     }
 }

@@ -386,16 +386,6 @@ class CreateDidOperationTest {
     }
 
     @Test
-    void nextKeyHashInvalidFormatThrows() {
-        assertThatThrownBy(() ->
-                DidWebVh.create("example.com", testSigner)
-                        .nextKeyHashes(Collections.singletonList("notMultibase"))
-                        .execute())
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("multibase-encoded");
-    }
-
-    @Test
     void nextKeyHashEmptyEntryThrows() {
         assertThatThrownBy(() ->
                 DidWebVh.create("example.com", testSigner)
