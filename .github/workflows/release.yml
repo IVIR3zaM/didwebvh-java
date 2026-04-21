@@ -25,6 +25,9 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
 
+      - name: Set release version from tag
+        run: ./mvnw -B versions:set -DnewVersion=${GITHUB_REF_NAME#v} -DgenerateBackupPoms=false
+
       - name: Publish to Maven Central
         run: ./mvnw clean deploy -P release -B --no-transfer-progress -DskipTests
         env:
