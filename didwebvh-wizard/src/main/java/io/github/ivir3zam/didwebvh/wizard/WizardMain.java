@@ -24,7 +24,8 @@ public final class WizardMain implements Callable<Integer> {
     private Path workDir = Paths.get(".");
 
     @Option(names = {"-a", "--action"},
-            description = "Skip the main menu and run a single action: create | update | resolve.")
+            description = "Skip the main menu and run a single action: "
+                    + "create | update | resolve | export.")
     private String action;
 
     public static void main(String[] args) {
@@ -61,9 +62,10 @@ public final class WizardMain implements Callable<Integer> {
             io.println("  1. Create a new DID");
             io.println("  2. Update an existing DID");
             io.println("  3. Resolve a DID");
-            io.println("  4. Exit");
-            int choice = ask.askChoice("Choose 1-4: ", 4);
-            if (choice == 4) {
+            io.println("  4. Export parallel did:web document");
+            io.println("  5. Exit");
+            int choice = ask.askChoice("Choose 1-5: ", 5);
+            if (choice == 5) {
                 io.println("Goodbye.");
                 return 0;
             }
@@ -86,9 +88,12 @@ public final class WizardMain implements Callable<Integer> {
             case "resolve":
                 new ResolveWizard(io).run(workDir);
                 return 0;
+            case "export":
+                new ExportDidWebWizard(io).run(workDir);
+                return 0;
             default:
                 throw new WizardException("Unknown action: " + name
-                        + " (expected create | update | resolve)");
+                        + " (expected create | update | resolve | export)");
         }
     }
 
@@ -97,6 +102,7 @@ public final class WizardMain implements Callable<Integer> {
             case 1: return "create";
             case 2: return "update";
             case 3: return "resolve";
+            case 4: return "export";
             default: throw new WizardException("Unknown menu choice: " + choice);
         }
     }

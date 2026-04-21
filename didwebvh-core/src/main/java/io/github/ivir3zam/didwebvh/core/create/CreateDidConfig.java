@@ -20,6 +20,7 @@ public final class CreateDidConfig {
     private Boolean portable;
     private Integer ttl;
     private List<String> alsoKnownAs;
+    private List<String> controllers;
     private WitnessConfig witness;
     private List<String> watchers;
     private List<String> nextKeyHashes;
@@ -48,6 +49,27 @@ public final class CreateDidConfig {
     public CreateDidConfig alsoKnownAs(List<String> alsoKnownAs) {
         this.alsoKnownAs = alsoKnownAs == null
                 ? null : new ArrayList<>(alsoKnownAs);
+        return this;
+    }
+
+    /**
+     * Set the DID Document {@code controller} property.
+     *
+     * <p>Per DID Core v1.0 §5.1.2 {@code controller} is optional; the webvh spec adds
+     * no requirement on top of that.  This method lets callers opt into explicit
+     * controller values:
+     *
+     * <ul>
+     *   <li>{@code null} (default) – emit {@code "controller": "<this DID>"}, the
+     *       historical behaviour;</li>
+     *   <li>empty list – omit the {@code controller} property entirely;</li>
+     *   <li>one element – emit {@code "controller": "<did>"} (string form);</li>
+     *   <li>multiple elements – emit {@code "controller": [...]} (array form).</li>
+     * </ul>
+     */
+    public CreateDidConfig controllers(List<String> controllers) {
+        this.controllers = controllers == null
+                ? null : new ArrayList<>(controllers);
         return this;
     }
 
@@ -102,6 +124,10 @@ public final class CreateDidConfig {
 
     List<String> getAlsoKnownAs() {
         return alsoKnownAs;
+    }
+
+    List<String> getControllers() {
+        return controllers;
     }
 
     WitnessConfig getWitness() {

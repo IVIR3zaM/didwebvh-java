@@ -25,7 +25,7 @@ class WizardMainTest {
                 "n",                        // witnesses
                 "",                         // watchers
                 "",                         // ttl default
-                "4"                         // menu: exit
+                "5"                         // menu: exit
         );
         WizardMain main = new WizardMain();
         main.setWorkDir(tmp);

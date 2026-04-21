@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-21
+
+### Added
+- **Wizard – Export parallel `did:web` document**: new menu option
+  (also `--action export`) that resolves the local `did.jsonl` and
+  writes a spec-compliant `did.json` via `DidWebPublisher.toDidWeb(...)`
+  so publishers can serve a parallel `did:web` without leaving the CLI.
+- **Core API – explicit controller support on create**:
+  `CreateDidConfig.controllers(List<String>)` makes the DID Document
+  `controller` property fully optional per DID Core §5.1.2. Passing
+  `null` keeps the historical default (controller = the DID itself);
+  an empty list omits the property; one or many entries emit string
+  or array form respectively. The wizard exposes this via a new
+  “Controller” prompt (blank = default, `-` = omit, comma list).
+- **README**: end-to-end library usage guide covering create, resolve,
+  update/migrate/deactivate, pre-rotation, witness configuration,
+  parallel did:web export, and custom `Signer` implementations — so
+  the library can be used standalone without the wizard.
+
+### Changed
+- **Wizard – update flow preserves existing state**:
+  - Witness configure seeds from the active `WitnessConfig` so existing
+    witnesses are kept and the threshold can span the full merged set.
+    Adds an explicit “Remove an existing witness” option.
+  - Watcher update shows the current list and **appends** new entries
+    by default (comma-separated), with `clear` to wipe. Previously the
+    input silently **replaced** the list, dropping existing watchers.
+- **Wizard – witness proofs**: Create and Update now auto-sign with
+  **every** stored witness secret that matches the authorized set,
+  rather than stopping at the threshold. Threshold is a lower bound
+  for prompting, not an upper bound for signing.
+- **Wizard – shaded jar naming**: the CLI uber-jar is now
+  `didwebvh-wizard/target/didwebvh-wizard.jar` (stable name, no
+  version, no classifier). The wizard is excluded from Maven Central
+  deploy, so replacing the thin jar with the shaded jar is safe.
+
+### Fixed
+- **Create with witnesses left the first entry unpublishable**: when
+  a witness configuration was active on the very first log entry, no
+  `did-witness.json` was produced, so spec-compliant resolvers failed
+  with *“Witness proofs are required but were not provided.”* The
+  Create wizard now collects witness proofs for the first entry and
+  writes `did-witness.json` before `did.jsonl` (spec §3.7.8 ordering).
+- **Export wizard failed on witnessed DIDs**: `DidResolver.resolveFromLog`
+  requires a witness-proof collection whenever the active config has
+  witnesses. Export now uses `DidWebVhState.validate()` for chain
+  integrity and takes the DID Document directly from the latest log
+  entry, so export works on witnessed DIDs without an in-memory
+  `did-witness.json` hand-off.
+- **Witness menu numbering collision**: the “Current witnesses” list
+  no longer shares indices with the action menu — the current set is
+  rendered as bullet points with a size header, and the “Remove”
+  sub-step re-prints numbered options when an index is requested.
+
 ## [0.1.0] - 2026-04-20
 
 Initial public release of `didwebvh-java`, a Java 11+ implementation of the

@@ -15,7 +15,6 @@ import io.github.ivir3zam.didwebvh.core.signing.Signer;
 import io.github.ivir3zam.didwebvh.core.update.UpdateDidResult;
 import io.github.ivir3zam.didwebvh.core.witness.WitnessConfig;
 import io.github.ivir3zam.didwebvh.core.witness.WitnessEntry;
-import io.github.ivir3zam.didwebvh.core.witness.WitnessProofCollection;
 import io.github.ivir3zam.didwebvh.core.witness.WitnessProofEntry;
 
 import java.io.IOException;

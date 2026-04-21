@@ -1,6 +1,5 @@
 package io.github.ivir3zam.didwebvh.core.url;
 
-import io.github.ivir3zam.didwebvh.core.UrlParseException;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

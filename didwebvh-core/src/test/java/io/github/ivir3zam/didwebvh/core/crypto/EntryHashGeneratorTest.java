@@ -5,8 +5,6 @@ import io.github.ivir3zam.didwebvh.core.model.LogEntry;
 import io.github.ivir3zam.didwebvh.core.model.Parameters;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EntryHashGeneratorTest {

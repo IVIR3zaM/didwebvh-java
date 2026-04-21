@@ -1,6 +1,5 @@
 package io.github.ivir3zam.didwebvh.wizard;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -9,13 +8,12 @@ import io.github.ivir3zam.didwebvh.core.DidWebVh;
 import io.github.ivir3zam.didwebvh.core.create.CreateDidConfig;
 import io.github.ivir3zam.didwebvh.core.create.CreateDidResult;
 import io.github.ivir3zam.didwebvh.core.crypto.PreRotationHashGenerator;
+import io.github.ivir3zam.didwebvh.core.model.Parameters;
 import io.github.ivir3zam.didwebvh.core.witness.WitnessConfig;
-import io.github.ivir3zam.didwebvh.core.witness.WitnessEntry;
 import io.github.ivir3zam.didwebvh.signing.local.LocalKeySigner;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,6 +51,11 @@ public final class CreateWizard {
             config.alsoKnownAs(alsoKnownAs);
         }
 
+        List<String> controllers = readControllers();
+        if (controllers != null) {
+            config.controllers(controllers);
+        }
+
         JsonObject additional = buildAdditionalDocumentContent();
         if (additional.size() > 0) {
             config.additionalDocumentContent(additional);
@@ -75,7 +78,7 @@ public final class CreateWizard {
             config.nextKeyHashes(Collections.singletonList(hash));
         }
 
-        WitnessConfig witness = readWitnessConfig();
+        WitnessConfig witness = readWitnessConfig(workDir);
         if (witness != null) {
             config.witness(witness);
         }
@@ -91,6 +94,17 @@ public final class CreateWizard {
         }
 
         CreateDidResult result = config.execute();
+
+        // Spec 3.7.8: did-witness.json MUST be published BEFORE did.jsonl. If the
+        // first entry already activates a witness set, resolvers expect proofs for
+        // that entry too, so collect them before writing the log.
+        if (witness != null && witness.isActive()) {
+            new WizardWitnessProofs(io).collectForNewEntries(
+                    Parameters.defaults(),
+                    Collections.singletonList(result.getLogEntry()),
+                    workDir);
+        }
+
         WizardFiles.write(workDir.resolve(WizardFiles.DID_LOG), result.getLogLine());
 
         io.println("");
@@ -136,23 +150,36 @@ public final class CreateWizard {
         return out;
     }
 
-    private JsonObject buildAdditionalDocumentContent() {
-        JsonObject extra = new JsonObject();
-
-        String controllerLine = ask.askOptional(
-                "Additional controller DIDs (comma-separated, blank to skip): ", null);
-        if (controllerLine != null) {
-            JsonArray arr = new JsonArray();
-            for (String part : controllerLine.split(",")) {
-                String trimmed = part.trim();
-                if (!trimmed.isEmpty()) {
-                    arr.add(trimmed);
-                }
-            }
-            if (arr.size() > 0) {
-                extra.add("controller", arr);
+    /**
+     * Ask for the DID Document {@code controller} property.  Returns {@code null} to
+     * keep the library default (single controller = the DID itself); an empty list
+     * to emit no {@code controller} property; a non-empty list otherwise.
+     */
+    private List<String> readControllers() {
+        io.println("");
+        io.println("Controller (DID Document 'controller' property):");
+        io.println("  blank   keep default (controller = the DID itself)");
+        io.println("  '-'     omit the controller property entirely");
+        io.println("  list    comma-separated DIDs to use as controller(s)");
+        String line = ask.askOptional("Controllers: ", null);
+        if (line == null) {
+            return null;
+        }
+        if ("-".equals(line.trim())) {
+            return Collections.emptyList();
+        }
+        List<String> controllers = new ArrayList<>();
+        for (String part : line.split(",")) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty()) {
+                controllers.add(trimmed);
             }
         }
+        return controllers.isEmpty() ? null : controllers;
+    }
+
+    private JsonObject buildAdditionalDocumentContent() {
+        JsonObject extra = new JsonObject();
 
         String services = ask.askOptional(
                 "Services JSON array (paste one line, blank to skip): ", null);
@@ -170,32 +197,10 @@ public final class CreateWizard {
         return extra;
     }
 
-    private WitnessConfig readWitnessConfig() {
+    private WitnessConfig readWitnessConfig(Path workDir) {
         if (!ask.askYesNo("Configure witnesses?", false)) {
             return null;
         }
-        List<WitnessEntry> entries = new ArrayList<>();
-        io.println("Enter witness DIDs one per line ('done' to finish).");
-        while (true) {
-            String line = ask.askOptional("Witness DID: ", null);
-            if (line == null || line.equalsIgnoreCase("done")) {
-                break;
-            }
-            entries.add(new WitnessEntry(line));
-        }
-        if (entries.isEmpty()) {
-            io.println("No witnesses entered, skipping witness config.");
-            return null;
-        }
-        int defaultThreshold = (entries.size() / 2) + 1;
-        int threshold = ask.askInt(
-                "Witness threshold [default " + defaultThreshold
-                        + ", max " + entries.size() + "]: ",
-                defaultThreshold);
-        if (threshold < 1 || threshold > entries.size()) {
-            throw new WizardException("Threshold must be between 1 and " + entries.size());
-        }
-        return new WitnessConfig(threshold, new ArrayList<>(Arrays.asList(
-                entries.toArray(new WitnessEntry[0]))));
+        return new WizardWitnessKeys(io).configure(workDir);
     }
 }

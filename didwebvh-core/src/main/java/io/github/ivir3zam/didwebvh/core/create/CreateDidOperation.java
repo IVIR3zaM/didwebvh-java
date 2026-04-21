@@ -14,6 +14,7 @@ import io.github.ivir3zam.didwebvh.core.signing.Signer;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -114,8 +115,9 @@ final class CreateDidOperation {
         doc.addProperty("@context", "https://www.w3.org/ns/did/v1");
         doc.addProperty("id", didTemplate);
 
-        // Controller defaults to the DID itself
-        doc.addProperty("controller", didTemplate);
+        // Controller is optional per DID Core §5.1.2. Historical default is the DID
+        // itself (preserved when the caller doesn't set controllers explicitly).
+        addControllerProperty(doc, didTemplate, config.getControllers());
 
         // Verification method from signer
         JsonObject vm = new JsonObject();
@@ -156,6 +158,28 @@ final class CreateDidOperation {
         }
 
         return doc;
+    }
+
+    private static void addControllerProperty(JsonObject doc, String didTemplate,
+                                               List<String> controllers) {
+        if (controllers == null) {
+            // Backward-compatible default: single controller equal to the DID.
+            doc.addProperty("controller", didTemplate);
+            return;
+        }
+        if (controllers.isEmpty()) {
+            // Explicit opt-out: omit the controller property entirely.
+            return;
+        }
+        if (controllers.size() == 1) {
+            doc.addProperty("controller", controllers.get(0));
+            return;
+        }
+        JsonArray arr = new JsonArray();
+        for (String c : controllers) {
+            arr.add(c);
+        }
+        doc.add("controller", arr);
     }
 
     private static Parameters buildParameters(String signerMultikey,

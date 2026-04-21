@@ -12,6 +12,7 @@ final class WizardFiles {
     static final String DID_SECRETS = "did-secrets.json";
     static final String DID_WITNESS = "did-witness.json";
     static final String NEXT_KEY_SECRETS = "did-next-key.json";
+    static final String WITNESSES_DIR = "witnesses";
 
     private WizardFiles() {
     }

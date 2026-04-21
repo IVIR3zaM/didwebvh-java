@@ -80,6 +80,37 @@ class CreateWizardTest {
     }
 
     @Test
+    void witnessGenerateStoresSecretAndWritesProofs(@TempDir Path tmp) {
+        ScriptedWizardIo io = new ScriptedWizardIo(
+                "example.com", "",
+                "1",                // generate key
+                "",                 // alsoKnownAs
+                "",                 // extra controllers
+                "",                 // services
+                "n",                // portable
+                "n",                // pre-rotation
+                "y",                // configure witnesses
+                "1",                // generate new witness (auto-stored locally)
+                "6",                // done
+                "",                 // threshold (default 1)
+                "",                 // watchers
+                ""                  // ttl
+        );
+        String did = new CreateWizard(io).run(tmp);
+        assertThat(did).startsWith("did:webvh:");
+        Path witnessesDir = tmp.resolve(WizardFiles.WITNESSES_DIR);
+        assertThat(witnessesDir).exists();
+        assertThat(witnessesDir.toFile().listFiles()).hasSize(1);
+
+        // The generated witness's stored secret must have been used to sign the first
+        // entry so the did-witness.json is ready to publish alongside did.jsonl.
+        Path witnessFile = tmp.resolve(WizardFiles.DID_WITNESS);
+        assertThat(witnessFile).exists();
+        String witnessJson = WizardFiles.read(witnessFile);
+        assertThat(witnessJson).startsWith("[").contains("\"versionId\"").contains("1-");
+    }
+
+    @Test
     void rejectsInvalidServicesJson(@TempDir Path tmp) {
         ScriptedWizardIo io = new ScriptedWizardIo(
                 "example.com",

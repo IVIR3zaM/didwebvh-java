@@ -1,7 +1,6 @@
 package io.github.ivir3zam.didwebvh.core.url;
 
 import java.net.IDN;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.List;
