@@ -24,7 +24,7 @@ Set up the multi-module Maven project structure, CI pipeline, and quality toolin
 1. **Create the Maven Wrapper** (`mvnw`, `mvnw.cmd`, `.mvn/wrapper/`). Use Maven 3.9.x.
 
 2. **Create the parent POM** (`pom.xml`) with:
-   - `groupId`: `io.github.ivir3zam`
+   - `groupId`: `io.github.decentralized-identity`
    - `artifactId`: `didwebvh-java`
    - `version`: `0.1.0-SNAPSHOT`
    - `packaging`: `pom`
@@ -59,8 +59,8 @@ Set up the multi-module Maven project structure, CI pipeline, and quality toolin
    - `didwebvh-wizard/pom.xml`: depends on `didwebvh-core`, `didwebvh-signing-local`, picocli, jline. Test deps: junit-jupiter, assertj.
 
 4. **Create empty source directories** for each module:
-   - `src/main/java/io/github/ivir3zam/didwebvh/...`
-   - `src/test/java/io/github/ivir3zam/didwebvh/...`
+   - `src/main/java/io/github/decentralized-identity/didwebvh/...`
+   - `src/test/java/io/github/decentralized-identity/didwebvh/...`
    - `src/test/resources/`
    - Add a placeholder class in each module so the compiler has something to compile (e.g., `package-info.java`).
 
@@ -908,7 +908,7 @@ Build an interactive CLI wizard in the `didwebvh-wizard` module, similar to the 
 - Non-interactive mode works for CI/testing
 
 ### Implementation Notes
-- Added nine classes in `didwebvh-wizard/src/main/java/io/github/ivir3zam/didwebvh/wizard/`:
+- Added nine classes in `didwebvh-wizard/src/main/java/io/github/decentralized-identity/didwebvh/wizard/`:
   `WizardIo` (abstraction over stdin/stdout), `ConsoleWizardIo` (JLine-backed implementation),
   `WizardException`, `WizardPrompts` (shared input parsers for yes/no, ints, multi-line JSON,
   comma-separated lists), `WizardFiles` (read/write `did.jsonl`, `did-secrets.json`,
@@ -987,7 +987,7 @@ Add test vectors from the spec examples and from the Rust implementation. Ensure
 - All tests pass on Java 11, 17, 21, and 25
 
 ### Implementation Notes
-- Added three classes in `didwebvh-core/src/test/java/io/github/ivir3zam/didwebvh/core/integration/`:
+- Added three classes in `didwebvh-core/src/test/java/io/github/decentralized-identity/didwebvh/core/integration/`:
   `TestVectors` (classpath loader, JSONL/witness parsers, and a deterministic
   Ed25519 seeded `Signer` factory built on four fixed 32-byte seeds — author,
   update, next, witness), `TestVectorGenerator` (runnable `main` that produces

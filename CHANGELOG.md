@@ -101,5 +101,5 @@ Initial public release of `didwebvh-java`, a Java 11+ implementation of the
   `.github/workflows/release.yml` that publishes to Sonatype Central on
   tag push (`v*`) and attaches JARs to the GitHub Release.
 
-[Unreleased]: https://github.com/IVIR3zaM/didwebvh-java/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/IVIR3zaM/didwebvh-java/releases/tag/v0.1.0
+[Unreleased]: https://github.com/decentralized-identity/didwebvh-java/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/decentralized-identity/didwebvh-java/releases/tag/v0.1.0

@@ -22,7 +22,7 @@ didwebvh-java/
   pom.xml                          # Parent POM (multi-module Maven)
   didwebvh-core/                   # Core library
     pom.xml
-    src/main/java/io/github/ivir3zam/didwebvh/
+    src/main/java/io/github/decentralized-identity/didwebvh/
       core/                        # Top-level API (DidWebVh facade)
       model/                       # Data model (LogEntry, Parameters, DidDocument, etc.)
       crypto/                      # Hash, SCID, entry hash, JCS canonicalization
@@ -38,11 +38,11 @@ didwebvh-java/
     src/test/resources/            # Test vectors (JSONL files, JSON files)
   didwebvh-signing-local/          # Local JSON key file signer
     pom.xml
-    src/main/java/io/github/ivir3zam/didwebvh/signing/local/
+    src/main/java/io/github/decentralized-identity/didwebvh/signing/local/
       LocalKeySigner.java
   didwebvh-wizard/                 # Interactive CLI
     pom.xml
-    src/main/java/io/github/ivir3zam/didwebvh/wizard/
+    src/main/java/io/github/decentralized-identity/didwebvh/wizard/
       WizardMain.java
       CreateWizard.java
       UpdateWizard.java

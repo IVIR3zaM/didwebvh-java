@@ -14,7 +14,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 ### Setup
 
 ```bash
-git clone https://github.com/IVIR3zaM/didwebvh-java.git
+git clone https://github.com/decentralized-identity/didwebvh-java.git
 cd didwebvh-java
 ./mvnw clean verify
 ```
@@ -47,7 +47,7 @@ The project works with any Java IDE. Recommended:
 
 ### Reporting Bugs
 
-Open a [GitHub Issue](https://github.com/IVIR3zaM/didwebvh-java/issues) with:
+Open a [GitHub Issue](https://github.com/decentralized-identity/didwebvh-java/issues) with:
 - What you expected to happen
 - What actually happened
 - Steps to reproduce

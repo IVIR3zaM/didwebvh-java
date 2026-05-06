@@ -1,11 +1,11 @@
 # didwebvh-java
 
-[![Java CI](https://github.com/IVIR3zaM/didwebvh-java/actions/workflows/ci.yml/badge.svg)](https://github.com/IVIR3zaM/didwebvh-java/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/IVIR3zaM/didwebvh-java/branch/main/graph/badge.svg)](https://codecov.io/gh/IVIR3zaM/didwebvh-java)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.ivir3zam/didwebvh-java.svg)](https://central.sonatype.com/artifact/io.github.ivir3zam/didwebvh-java)
+[![Java CI](https://github.com/decentralized-identity/didwebvh-java/actions/workflows/ci.yml/badge.svg)](https://github.com/decentralized-identity/didwebvh-java/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/decentralized-identity/didwebvh-java/branch/main/graph/badge.svg)](https://codecov.io/gh/decentralized-identity/didwebvh-java)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.decentralized-identity/didwebvh-java.svg)](https://central.sonatype.com/artifact/io.github.decentralized-identity/didwebvh-java)
 [![Java Version](https://img.shields.io/badge/Java-11%2B-blue)](https://adoptium.net/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IVIR3zaM_didwebvh-java&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IVIR3zaM_didwebvh-java)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=decentralized-identity_didwebvh-java&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=decentralized-identity_didwebvh-java)
 
 A Java 11+ library for the [did:webvh](https://didwebvh.info/) (DID Web + Verifiable History) DID Method, v1.0.
 
@@ -31,7 +31,7 @@ A Java 11+ library for the [did:webvh](https://didwebvh.info/) (DID Web + Verifi
 
 ```xml
 <dependency>
-    <groupId>io.github.ivir3zam</groupId>
+    <groupId>io.github.decentralizedidentity</groupId>
     <artifactId>didwebvh-java</artifactId>
     <version>0.2.0</version>
 </dependency>
@@ -44,21 +44,21 @@ need the local-key adapter.
 ### Gradle
 
 ```groovy
-implementation 'io.github.ivir3zam:didwebvh-java:0.2.0'
+implementation 'io.github.decentralized-identity:didwebvh-java:0.2.0'
 ```
 
 ## Library Usage
 
-All DID operations are exposed as static entry points on `io.github.ivir3zam.didwebvh.core.DidWebVh`.
+All DID operations are exposed as static entry points on `io.github.decentralizedidentity.didwebvh.core.DidWebVh`.
 The examples below use `LocalKeySigner` from `didwebvh-signing-local`; see
 [Pluggable Key Management](#pluggable-key-management) for custom `Signer` implementations.
 
 ### Create a DID
 
 ```java
-import io.github.ivir3zam.didwebvh.core.DidWebVh;
-import io.github.ivir3zam.didwebvh.core.create.CreateDidResult;
-import io.github.ivir3zam.didwebvh.signing.local.LocalKeySigner;
+import io.github.decentralizedidentity.didwebvh.core.DidWebVh;
+import io.github.decentralizedidentity.didwebvh.core.create.CreateDidResult;
+import io.github.decentralizedidentity.didwebvh.signing.local.LocalKeySigner;
 
 LocalKeySigner signer = LocalKeySigner.generate();
 
@@ -82,10 +82,10 @@ Files.writeString(Paths.get("did-secrets.json"), signer.toJson());
 ### Resolve a DID
 
 ```java
-import io.github.ivir3zam.didwebvh.core.DidWebVh;
-import io.github.ivir3zam.didwebvh.core.model.ResolveResult;
-import io.github.ivir3zam.didwebvh.core.resolve.DidResolver;
-import io.github.ivir3zam.didwebvh.core.resolve.ResolveOptions;
+import io.github.decentralizedidentity.didwebvh.core.DidWebVh;
+import io.github.decentralizedidentity.didwebvh.core.model.ResolveResult;
+import io.github.decentralizedidentity.didwebvh.core.resolve.DidResolver;
+import io.github.decentralizedidentity.didwebvh.core.resolve.ResolveOptions;
 
 // Remote resolution over HTTPS:
 ResolveResult remote = DidWebVh.resolve("did:webvh:QmSCID:example.com");
@@ -106,10 +106,10 @@ System.out.println(offline.getDidDocument().asJsonObject());
 `DidWebVhState` holds the validated log state and is the input to every update:
 
 ```java
-import io.github.ivir3zam.didwebvh.core.DidWebVh;
-import io.github.ivir3zam.didwebvh.core.DidWebVhState;
-import io.github.ivir3zam.didwebvh.core.model.Parameters;
-import io.github.ivir3zam.didwebvh.core.update.UpdateDidResult;
+import io.github.decentralizedidentity.didwebvh.core.DidWebVh;
+import io.github.decentralizedidentity.didwebvh.core.DidWebVhState;
+import io.github.decentralizedidentity.didwebvh.core.model.Parameters;
+import io.github.decentralizedidentity.didwebvh.core.update.UpdateDidResult;
 
 DidWebVhState state = DidWebVhState.fromDidLog(did, jsonl);
 
@@ -147,7 +147,7 @@ Publish a hash of the next authorization key; rotation must reveal that key or t
 becomes unrecoverable:
 
 ```java
-import io.github.ivir3zam.didwebvh.core.crypto.PreRotationHashGenerator;
+import io.github.decentralizedidentity.didwebvh.core.crypto.PreRotationHashGenerator;
 
 LocalKeySigner nextSigner = LocalKeySigner.generate();
 String nextHash = PreRotationHashGenerator.generateHash(nextSigner.getPublicKeyMultikey());
@@ -166,8 +166,8 @@ Witnesses co-sign each new log entry; their proofs live in `did-witness.json` ne
 `did.jsonl` and MUST be published first (spec §3.7.8).
 
 ```java
-import io.github.ivir3zam.didwebvh.core.witness.WitnessConfig;
-import io.github.ivir3zam.didwebvh.core.witness.WitnessEntry;
+import io.github.decentralizedidentity.didwebvh.core.witness.WitnessConfig;
+import io.github.decentralizedidentity.didwebvh.core.witness.WitnessEntry;
 
 WitnessConfig witness = new WitnessConfig(
         2,  // threshold
@@ -180,7 +180,7 @@ DidWebVh.create("example.com", signer).witness(witness).execute();
 
 Collecting witness proofs (sign `{"versionId":"<id>"}` with each authorized witness key and
 write them to `did-witness.json`) is done outside `DidWebVh.update`; see
-[`WizardWitnessProofs`](didwebvh-wizard/src/main/java/io/github/ivir3zam/didwebvh/wizard/WizardWitnessProofs.java)
+[`WizardWitnessProofs`](didwebvh-wizard/src/main/java/io/github/decentralized-identity/didwebvh/wizard/WizardWitnessProofs.java)
 for a reference implementation that uses `ProofGenerator` and `WitnessProofEntry`.
 
 ### Publish a parallel `did:web` document
@@ -189,8 +189,8 @@ The spec (§3.7.10) lets a `did:webvh` publisher also serve a plain `did:web` do
 the same URL, so clients that do not understand `did:webvh` can still resolve the DID.
 
 ```java
-import io.github.ivir3zam.didwebvh.core.didweb.DidWebPublisher;
-import io.github.ivir3zam.didwebvh.core.model.DidDocument;
+import io.github.decentralizedidentity.didwebvh.core.didweb.DidWebPublisher;
+import io.github.decentralizedidentity.didwebvh.core.model.DidDocument;
 
 DidDocument resolved = new DidResolver().resolveFromLog(jsonl, did).getDidDocument();
 

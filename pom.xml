@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.ivir3zam</groupId>
+    <groupId>io.github.decentralizedidentity</groupId>
     <artifactId>didwebvh-java</artifactId>
     <version>0.2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>didwebvh-java</name>
     <description>Java implementation of the did:webvh DID method</description>
-    <url>https://github.com/IVIR3zaM/didwebvh-java</url>
+    <url>https://github.com/decentralized-identity/didwebvh-java</url>
     <inceptionYear>2026</inceptionYear>
 
     <licenses>
@@ -27,20 +27,20 @@
             <id>ivir3zam</id>
             <name>Reza Maghoul</name>
             <email>m.reza.maghool@gmail.com</email>
-            <url>https://github.com/IVIR3zaM</url>
+            <url>https://github.com/IVIR3zaM/</url>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/IVIR3zaM/didwebvh-java.git</connection>
-        <developerConnection>scm:git:git@github.com:IVIR3zaM/didwebvh-java.git</developerConnection>
-        <url>https://github.com/IVIR3zaM/didwebvh-java</url>
+        <connection>scm:git:https://github.com/decentralized-identity/didwebvh-java.git</connection>
+        <developerConnection>scm:git:git@github.com:decentralized-identity/didwebvh-java.git</developerConnection>
+        <url>https://github.com/decentralized-identity/didwebvh-java</url>
         <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/IVIR3zaM/didwebvh-java/issues</url>
+        <url>https://github.com/decentralized-identity/didwebvh-java/issues</url>
     </issueManagement>
 
     <modules>
@@ -86,12 +86,12 @@
         <dependencies>
             <!-- Internal modules -->
             <dependency>
-                <groupId>io.github.ivir3zam</groupId>
+                <groupId>io.github.decentralizedidentity</groupId>
                 <artifactId>didwebvh-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.ivir3zam</groupId>
+                <groupId>io.github.decentralizedidentity</groupId>
                 <artifactId>didwebvh-signing-local</artifactId>
                 <version>${project.version}</version>
             </dependency>

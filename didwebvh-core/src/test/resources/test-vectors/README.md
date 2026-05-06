@@ -21,7 +21,7 @@ under `src/test/java/.../integration/`).
 ```
 ./mvnw -pl didwebvh-core test-compile
 java -cp "$(./mvnw -pl didwebvh-core -q dependency:build-classpath -Dmdep.outputFile=/dev/stdout):didwebvh-core/target/classes:didwebvh-core/target/test-classes" \
-    io.github.ivir3zam.didwebvh.core.integration.TestVectorGenerator
+    io.github.decentralizedidentity.didwebvh.core.integration.TestVectorGenerator
 ```
 
 The seeds are fixed, but `versionTime` uses the wall clock — every
